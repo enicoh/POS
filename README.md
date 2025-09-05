@@ -43,7 +43,7 @@ Ce projet est une API RESTful basée sur Flask pour un système de point de vent
 1. **Cloner le dépôt** :
 
    ```bash
-   git clone <url-du-dépôt>
+   git clone https://github.com/Mazdiou/pos_api.git
    cd pos-api
    ```
 

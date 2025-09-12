@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, render_template, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models import db, User, Role
 from routes import init_app
+from pos_routes import init_pos_app
 from werkzeug.security import generate_password_hash
 import logging
 import os
@@ -24,6 +25,34 @@ def create_app(config_class=Config):
 
     # Register routes
     init_app(app)
+    init_pos_app(app)
+    
+    # Add static file routes
+    @app.route('/')
+    def index():
+        return render_template('login.html')
+    
+    @app.route('/login.html')
+    def login_page():
+        return render_template('login.html')
+    
+    @app.route('/admin_dashboard.html')
+    def admin_dashboard():
+        return render_template('admin_dashboard.html')
+    
+    @app.route('/cashier_pos.html')
+    def cashier_pos():
+        return render_template('cashier_pos.html')
+    
+    @app.route('/static/<path:filename>')
+    def static_files(filename):
+        return send_from_directory('static', filename)
+    
+    @app.route('/<filename>')
+    def serve_js_files(filename):
+        if filename.endswith('.js'):
+            return send_from_directory('static', filename)
+        return "File not found", 404
 
     return app
 

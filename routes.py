@@ -366,6 +366,51 @@ def get_sales():
         'total': total_sales
     }), 200
 
+# ---------- DASHBOARD STATISTICS ----------
+@api.route('/dashboard/stats', methods=['GET'])
+@_require_auth()
+def get_dashboard_stats():
+    """Get dashboard statistics including today's sales and orders."""
+    logger.info("Processing get dashboard stats request")
+    
+    try:
+        # Get today's date range
+        today = datetime.now(timezone.utc).date()
+        start_of_day = datetime.combine(today, datetime.min.time()).replace(tzinfo=timezone.utc)
+        end_of_day = datetime.combine(today, datetime.max.time()).replace(tzinfo=timezone.utc)
+        
+        # Get today's completed orders
+        today_orders = db.session.query(Order).filter(
+            Order.status == 'completed',
+            Order.completed_at >= start_of_day,
+            Order.completed_at <= end_of_day
+        ).all()
+        
+        # Calculate today's statistics
+        today_sales = sum(order.total for order in today_orders)
+        today_orders_count = len(today_orders)
+        
+        # Get total products count
+        total_products = db.session.query(Product).count()
+        
+        # Get low stock products count
+        low_stock_products = db.session.query(Product).filter(
+            Product.stock <= Product.low_stock_threshold
+        ).count()
+        
+        logger.info(f"Dashboard stats - Today's sales: {today_sales}, Orders: {today_orders_count}")
+        
+        return jsonify({
+            'today_sales': today_sales,
+            'today_orders': today_orders_count,
+            'total_products': total_products,
+            'low_stock_count': low_stock_products
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting dashboard stats: {str(e)}")
+        return jsonify({'error': 'Failed to get dashboard statistics'}), 500
+
 # ---------- CASH REGISTER SESSIONS ----------
 @api.route('/cash-register-sessions', methods=['POST'])
 @_require_auth(Role.CASHIER)

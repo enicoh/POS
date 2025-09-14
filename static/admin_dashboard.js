@@ -114,11 +114,17 @@ function showSection(sectionName) {
 // Dashboard functions
 async function loadDashboard() {
     try {
-        const inventory = await apiCall('/admin/inventory');
+        // Load dashboard statistics
+        const stats = await apiCall('/dashboard/stats');
         
         // Update stats
-        document.getElementById('total-products').textContent = inventory.total_products;
-        document.getElementById('low-stock-count').textContent = inventory.low_stock_count;
+        document.getElementById('total-products').textContent = stats.total_products;
+        document.getElementById('low-stock-count').textContent = stats.low_stock_count;
+        document.getElementById('today-sales').textContent = `DZD ${stats.today_sales.toFixed(2)}`;
+        document.getElementById('total-orders').textContent = stats.today_orders;
+        
+        // Load inventory for low stock products
+        const inventory = await apiCall('/admin/inventory');
         
         // Load low stock products
         const lowStockList = document.getElementById('low-stock-list');
@@ -138,12 +144,11 @@ async function loadDashboard() {
             `).join('');
         }
         
-        // Load today's sales (simplified)
-        document.getElementById('today-sales').textContent = 'DZD 0';
-        document.getElementById('total-orders').textContent = '0';
-        
     } catch (error) {
         console.error('Error loading dashboard:', error);
+        // Fallback to show 0 values
+        document.getElementById('today-sales').textContent = 'DZD 0.00';
+        document.getElementById('total-orders').textContent = '0';
     }
 }
 

@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', function() {
             resetProductModal();
         });
     }
+    
+    // Set up initial product submit button
+    const productSubmitBtn = document.getElementById('product-submit-btn');
+    if (productSubmitBtn) {
+        productSubmitBtn.onclick = addProduct;
+    }
 });
 
 // Authentication functions
@@ -360,7 +366,7 @@ async function loadProducts() {
 
 function showAddProductModal() {
     loadCategoriesForSelect();
-    clearProductForm();
+    resetProductModal(); // This will reset the modal to add mode
     const modal = new bootstrap.Modal(document.getElementById('addProductModal'));
     modal.show();
 }
@@ -1363,7 +1369,7 @@ async function editProduct(productId) {
         
         // Change modal title and button
         const titleEl = document.querySelector('#addProductModal .modal-title');
-        const buttonEl = document.querySelector('#addProductModal .btn-primary');
+        const buttonEl = document.getElementById('product-submit-btn');
         
         if (titleEl) {
             titleEl.textContent = 'Edit Product';
@@ -1624,7 +1630,7 @@ function clearProductForm() {
 function resetProductModal() {
     // Reset modal title and button to add mode
     const titleEl = document.querySelector('#addProductModal .modal-title');
-    const buttonEl = document.querySelector('#addProductModal .btn-primary');
+    const buttonEl = document.getElementById('product-submit-btn');
     
     if (titleEl) titleEl.textContent = 'Add New Product';
     if (buttonEl) {

@@ -1,6 +1,6 @@
 # Coffee Shop POS System - Professional Installer
 # PowerShell GUI Installer with comprehensive error handling
-# Version: 2.4 - Fixed Desktop Launcher & Infinite Refresh
+# Version: 2.5 - Fixed Cookie Authentication & Batch Termination
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -220,6 +220,9 @@ function Install-CoffeeShopPOS {
         Write-Log "Auto browser opening feature added - Web page will open automatically after installation"
         Write-Log "Desktop launcher fixed - .bat file now opens browser automatically"
         Write-Log "Infinite refresh bug fixed - Improved authentication logic"
+        Write-Log "Cookie authentication fixed - Removed secure flag for local development"
+        Write-Log "Batch file termination fixed - CTRL+C now works properly"
+        Write-Log "Debug logging added - Better troubleshooting capabilities"
         
         # Step 8: Create shortcuts and launcher
         $StatusLabel.Text = "Creating shortcuts..."
@@ -291,7 +294,7 @@ pause >nul
 # Create the main form
 function Show-InstallerGUI {
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = "Coffee Shop POS - Professional Installer v2.4"
+    $form.Text = "Coffee Shop POS - Professional Installer v2.5"
     $form.Size = New-Object System.Drawing.Size(500, 400)
     $form.StartPosition = "CenterScreen"
     $form.FormBorderStyle = "FixedDialog"
@@ -399,7 +402,7 @@ function Show-InstallerGUI {
         
         if ($success) {
             $result = [System.Windows.Forms.MessageBox]::Show(
-                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`n✅ SAMPLE DATA INCLUDED:`n• 27 Coffee Shop Products`n• 8 Categories (Coffee, Tea, Milk, Juices, etc.)`n• Realistic pricing and stock levels`n• Ready to use immediately`n`n✅ LATEST FIXES INCLUDED:`n• Fixed admin dashboard data display`n• Fixed product edit functionality`n• Fixed category product counts`n• Fixed all API endpoints`n• Improved error handling`n• Enhanced cashier modal with visible +/- buttons`n• Added stock display in product modal`n• Added quantity validation against stock limits`n• Improved button styling and user experience`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?`n(The web browser will open automatically)",
+                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`n✅ SAMPLE DATA INCLUDED:`n• 27 Coffee Shop Products`n• 8 Categories (Coffee, Tea, Milk, Juices, etc.)`n• Realistic pricing and stock levels`n• Ready to use immediately`n`n✅ LATEST FIXES INCLUDED:`n• Fixed admin dashboard data display`n• Fixed product edit functionality`n• Fixed category product counts`n• Fixed all API endpoints`n• Improved error handling`n• Enhanced cashier modal with visible +/- buttons`n• Added stock display in product modal`n• Added quantity validation against stock limits`n• Improved button styling and user experience`n• Fixed infinite refresh issue completely`n• Fixed cookie authentication for local development`n• Fixed CTRL+C termination in batch file`n• Added debug logging for troubleshooting`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?`n(The web browser will open automatically)",
                 "Installation Complete",
                 [System.Windows.Forms.MessageBoxButtons]::YesNo,
                 [System.Windows.Forms.MessageBoxIcon]::Information

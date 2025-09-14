@@ -73,7 +73,7 @@
     --accent-color: #28a745;
 }
 
-.product-details-row {
+.product-details-card {
     background-color: #f8f9fa;
 }
 .product-details-row td {
@@ -230,14 +230,15 @@
 .admin-card .card-header h5 {
     margin: 0;
     font-weight: 600;
+    color: white !important;
 }
 
 /* Dashboard title styling for better visibility */
 #dashboard-section h5 {
-    color: #2c3e50 !important;
+    color: white !important;
     font-weight: 700;
     font-size: 1.5rem;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .btn-admin {

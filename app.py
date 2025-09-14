@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request, redirect, url_for, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models import db, User, Role
@@ -7,6 +7,9 @@ from pos_routes import init_pos_app
 from werkzeug.security import generate_password_hash
 import logging
 import os
+import jwt as pyjwt
+from datetime import datetime, timedelta
+from functools import wraps
 from config import Config, TestConfig
 
 def create_app(config_class=Config):
@@ -27,6 +30,24 @@ def create_app(config_class=Config):
     init_app(app)
     init_pos_app(app)
     
+    # Authentication decorator for protected routes
+    def require_auth(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            token = request.cookies.get('auth_token')
+            if not token:
+                return redirect(url_for('login_page'))
+            
+            try:
+                payload = pyjwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+                # Check if token is expired
+                if payload.get('exp') < datetime.utcnow().timestamp():
+                    return redirect(url_for('login_page'))
+                return f(*args, **kwargs)
+            except (pyjwt.ExpiredSignatureError, pyjwt.InvalidTokenError):
+                return redirect(url_for('login_page'))
+        return decorated_function
+    
     # Add static file routes
     @app.route('/')
     def index():
@@ -37,10 +58,12 @@ def create_app(config_class=Config):
         return render_template('login.html')
     
     @app.route('/admin_dashboard.html')
+    @require_auth
     def admin_dashboard():
         return render_template('admin_dashboard.html')
     
     @app.route('/cashier_pos.html')
+    @require_auth
     def cashier_pos():
         return render_template('cashier_pos.html')
     

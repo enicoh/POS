@@ -84,6 +84,12 @@ def login():
         'user': user.to_dict()
     }), 200
 
+@api.route('/logout', methods=['POST'])
+def logout():
+    """Logout endpoint - clears authentication."""
+    logger.info("Processing logout request")
+    return jsonify({'message': 'Logged out successfully'}), 200
+
 # ---------- USERS ----------
 @api.route('/users', methods=['POST'])
 @_require_auth(Role.ADMIN)

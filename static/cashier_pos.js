@@ -991,6 +991,18 @@ function formatCurrency(amount) {
     return `DZD ${amount.toFixed(2)}`;
 }
 
+// Logout function
+function logout() {
+    // Clear localStorage
+    localStorage.removeItem('authToken');
+    
+    // Clear cookie
+    document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    
+    // Redirect to login page
+    window.location.href = '/login.html';
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Set default dates for any date inputs

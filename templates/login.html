@@ -73,7 +73,10 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    // Store token
+                    // Store token in cookie for server-side authentication
+                    document.cookie = `auth_token=${result.token}; path=/; max-age=86400; secure; samesite=strict`;
+                    
+                    // Also store in localStorage for API calls
                     localStorage.setItem('authToken', result.token);
                     
                     // Redirect based on user role

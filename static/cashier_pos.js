@@ -9,10 +9,17 @@ let selectedProduct = null;
 let selectedSize = null;
 let selectedModifiers = [];
 let modalQuantity = 1;
+let redirectAttempted = false;
 
 // Initialize the POS
 document.addEventListener('DOMContentLoaded', function() {
-    if (!authToken) {
+    // Check if we're already on the login page to prevent infinite redirects
+    if (window.location.pathname === '/login.html') {
+        return;
+    }
+    
+    if (!authToken && !redirectAttempted) {
+        redirectAttempted = true;
         window.location.href = '/login.html';
         return;
     }

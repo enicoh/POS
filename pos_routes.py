@@ -971,12 +971,32 @@ def generate_sales_report_pdf():
     doc.build(story)
     buffer.seek(0)
     
-    # Return PDF
+    # Save PDF to C:\Documents
+    import os
+    documents_path = r"C:\Documents"
+    
+    # Create Documents directory if it doesn't exist
+    if not os.path.exists(documents_path):
+        os.makedirs(documents_path)
+    
+    # Generate filename with timestamp
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"sales_report_{start_date or 'all'}_{end_date or 'present'}_{timestamp}.pdf"
+    filepath = os.path.join(documents_path, filename)
+    
+    # Save PDF to file
+    with open(filepath, 'wb') as f:
+        f.write(buffer.getvalue())
+    
+    logger.info(f"PDF report saved to: {filepath}")
+    
+    # Return PDF as download
     return Response(
         buffer.getvalue(),
         mimetype='application/pdf',
         headers={
-            'Content-Disposition': f'attachment; filename=sales_report_{start_date or "all"}_{end_date or "present"}.pdf'
+            'Content-Disposition': f'attachment; filename={filename}'
         }
     )
 

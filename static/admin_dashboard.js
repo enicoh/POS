@@ -30,11 +30,15 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserInfo();
     loadDashboard();
     
-    // Reset product modal when it's hidden
+    // Reset product modal when it's hidden (only if not in edit mode)
     const productModal = document.getElementById('addProductModal');
     if (productModal) {
         productModal.addEventListener('hidden.bs.modal', function() {
-            resetProductModal();
+            // Only reset if we're not in edit mode (check if button text is "Add Product")
+            const buttonEl = document.getElementById('product-submit-btn');
+            if (buttonEl && buttonEl.textContent === 'Add Product') {
+                resetProductModal();
+            }
         });
     }
     
@@ -1405,7 +1409,7 @@ async function editProduct(productId) {
             return;
         }
         
-        // Show modal first
+        // Show modal first (don't reset form for editing)
         const modal = new bootstrap.Modal(document.getElementById('addProductModal'));
         modal.show();
         

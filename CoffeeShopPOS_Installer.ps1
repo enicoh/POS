@@ -241,21 +241,14 @@ echo.
 cd /d "$script:InstallDir"
 call venv\Scripts\activate.bat
 echo.
-echo Starting server in background...
-start /B python app.py
+echo Starting server...
 echo.
-echo Waiting for server to start...
-timeout /t 5 /nobreak >nul
+echo Press CTRL+C to stop the server
 echo.
-echo Opening web browser...
-start http://127.0.0.1:8080
+python app.py
 echo.
-echo Coffee Shop POS is now running!
-echo Web browser should open automatically.
-echo.
-echo To stop the server, close this window.
-echo.
-pause
+echo Server stopped. Press any key to exit...
+pause >nul
 "@
         
         $startScript | Out-File -FilePath "$script:InstallDir\start_pos.bat" -Encoding ASCII
@@ -417,7 +410,7 @@ function Show-InstallerGUI {
                 Start-Process "$script:InstallDir\start_pos.bat"
                 
                 # Wait a moment for the server to start
-                Start-Sleep -Seconds 3
+                Start-Sleep -Seconds 5
                 
                 # Open the web browser automatically
                 try {

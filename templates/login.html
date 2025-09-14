@@ -74,7 +74,7 @@
                 
                 if (response.ok) {
                     // Store token in cookie for server-side authentication
-                    document.cookie = `auth_token=${result.token}; path=/; max-age=86400; secure; samesite=strict`;
+                    document.cookie = `auth_token=${result.token}; path=/; max-age=86400; samesite=strict`;
                     
                     // Also store in localStorage for API calls
                     localStorage.setItem('authToken', result.token);

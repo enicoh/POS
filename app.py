@@ -39,10 +39,8 @@ def create_app(config_class=Config):
                 return f(*args, **kwargs)
             
             token = request.cookies.get('auth_token')
-            print(f"DEBUG: Request to {request.path}, token present: {bool(token)}")
             
             if not token:
-                print(f"DEBUG: No token found, redirecting to login")
                 # Clear any existing auth token from localStorage via JavaScript
                 response = redirect(url_for('login_page'))
                 response.set_cookie('auth_token', '', expires=0)
@@ -52,14 +50,11 @@ def create_app(config_class=Config):
                 payload = pyjwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
                 # Check if token is expired
                 if payload.get('exp') < datetime.utcnow().timestamp():
-                    print(f"DEBUG: Token expired, redirecting to login")
                     response = redirect(url_for('login_page'))
                     response.set_cookie('auth_token', '', expires=0)
                     return response
-                print(f"DEBUG: Token valid, allowing access to {request.path}")
                 return f(*args, **kwargs)
-            except (pyjwt.ExpiredSignatureError, pyjwt.InvalidTokenError) as e:
-                print(f"DEBUG: Token invalid: {e}, redirecting to login")
+            except (pyjwt.ExpiredSignatureError, pyjwt.InvalidTokenError):
                 response = redirect(url_for('login_page'))
                 response.set_cookie('auth_token', '', expires=0)
                 return response

@@ -246,6 +246,9 @@ call venv\Scripts\activate.bat
 echo.
 echo Starting server...
 echo.
+echo Opening web browser...
+start http://127.0.0.1:8080
+echo.
 echo Press CTRL+C to stop the server
 echo.
 python app.py

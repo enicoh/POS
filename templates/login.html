@@ -99,30 +99,11 @@
             login();
         });
         
-        // Check if already logged in
+        // Clear any existing tokens on login page load
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (token) {
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    const now = Math.floor(Date.now() / 1000);
-                    
-                    if (payload.exp > now) {
-                        // Token is still valid, redirect based on role
-                        if (payload.role === 'admin') {
-                            window.location.href = '/admin_dashboard.html';
-                        } else {
-                            window.location.href = '/cashier_pos.html';
-                        }
-                    } else {
-                        // Token expired, remove it
-                        localStorage.removeItem('authToken');
-                    }
-                } catch (error) {
-                    // Invalid token, remove it
-                    localStorage.removeItem('authToken');
-                }
-            }
+            // Clear any existing tokens to ensure clean login
+            localStorage.removeItem('authToken');
+            document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         });
     </script>
 </body>

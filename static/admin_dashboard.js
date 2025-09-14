@@ -175,10 +175,27 @@ async function loadDashboard() {
         console.log('Dashboard stats received:', stats);
         
         // Update stats
-        document.getElementById('total-products').textContent = stats.total_products;
-        document.getElementById('low-stock-count').textContent = stats.low_stock_count;
-        document.getElementById('today-sales').textContent = `DZD ${stats.today_sales.toFixed(2)}`;
-        document.getElementById('total-orders').textContent = stats.today_orders;
+        const totalProductsEl = document.getElementById('total-products');
+        const lowStockEl = document.getElementById('low-stock-count');
+        const todaySalesEl = document.getElementById('today-sales');
+        const totalOrdersEl = document.getElementById('total-orders');
+        
+        if (totalProductsEl) {
+            totalProductsEl.textContent = stats.total_products;
+            console.log('Updated total products:', stats.total_products);
+        }
+        if (lowStockEl) {
+            lowStockEl.textContent = stats.low_stock_count;
+            console.log('Updated low stock:', stats.low_stock_count);
+        }
+        if (todaySalesEl) {
+            todaySalesEl.textContent = `DZD ${stats.today_sales.toFixed(2)}`;
+            console.log('Updated today sales:', stats.today_sales);
+        }
+        if (totalOrdersEl) {
+            totalOrdersEl.textContent = stats.today_orders;
+            console.log('Updated total orders:', stats.today_orders);
+        }
         
         // Load inventory for low stock products
         try {

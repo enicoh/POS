@@ -1415,19 +1415,50 @@ async function editProduct(productId) {
             const imageEl = document.getElementById('product-image-url');
             const lowStockEl = document.getElementById('product-low-stock');
             
-            if (nameEl) nameEl.value = product.name;
-            if (categoryEl) categoryEl.value = product.category_id;
-            if (priceEl) priceEl.value = product.price;
-            if (stockEl) stockEl.value = product.stock;
-            if (descEl) descEl.value = product.description || '';
-            if (imageEl) imageEl.value = product.image_url || '';
-            if (lowStockEl) lowStockEl.value = product.low_stock_threshold;
+            console.log('Setting form values:', {
+                name: product.name,
+                category_id: product.category_id,
+                price: product.price,
+                stock: product.stock,
+                description: product.description,
+                image_url: product.image_url,
+                low_stock_threshold: product.low_stock_threshold
+            });
+            
+            if (nameEl) {
+                nameEl.value = product.name;
+                console.log('Name set to:', nameEl.value);
+            }
+            if (categoryEl) {
+                categoryEl.value = product.category_id;
+                console.log('Category set to:', categoryEl.value);
+            }
+            if (priceEl) {
+                priceEl.value = product.price;
+                console.log('Price set to:', priceEl.value);
+            }
+            if (stockEl) {
+                stockEl.value = product.stock;
+                console.log('Stock set to:', stockEl.value);
+            }
+            if (descEl) {
+                descEl.value = product.description || '';
+                console.log('Description set to:', descEl.value);
+            }
+            if (imageEl) {
+                imageEl.value = product.image_url || '';
+                console.log('Image URL set to:', imageEl.value);
+            }
+            if (lowStockEl) {
+                lowStockEl.value = product.low_stock_threshold;
+                console.log('Low stock threshold set to:', lowStockEl.value);
+            }
             
             // Show image preview if there's an image URL
             if (product.image_url) {
                 showImagePreview(product.image_url, false);
             }
-        }, 100);
+        }, 200);
         
         // Change modal title and button
         const titleEl = document.querySelector('#addProductModal .modal-title');

@@ -34,24 +34,36 @@ def create_app(config_class=Config):
     def require_auth(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            # Check if we're already on the login page to prevent redirect loops
+            if request.path == '/login.html':
+                return f(*args, **kwargs)
+            
             token = request.cookies.get('auth_token')
             if not token:
-                return redirect(url_for('login_page'))
+                # Clear any existing auth token from localStorage via JavaScript
+                response = redirect(url_for('login_page'))
+                response.set_cookie('auth_token', '', expires=0)
+                return response
             
             try:
                 payload = pyjwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
                 # Check if token is expired
                 if payload.get('exp') < datetime.utcnow().timestamp():
-                    return redirect(url_for('login_page'))
+                    response = redirect(url_for('login_page'))
+                    response.set_cookie('auth_token', '', expires=0)
+                    return response
                 return f(*args, **kwargs)
             except (pyjwt.ExpiredSignatureError, pyjwt.InvalidTokenError):
-                return redirect(url_for('login_page'))
+                response = redirect(url_for('login_page'))
+                response.set_cookie('auth_token', '', expires=0)
+                return response
         return decorated_function
     
     # Add static file routes
     @app.route('/')
     def index():
-        return render_template('login.html')
+        # Always redirect to login page to prevent direct access
+        return redirect(url_for('login_page'))
     
     @app.route('/login.html')
     def login_page():

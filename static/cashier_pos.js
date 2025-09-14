@@ -15,15 +15,18 @@ let redirectAttempted = false;
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're already on the login page to prevent infinite redirects
     if (window.location.pathname === '/login.html' || window.location.pathname === '/') {
+        console.log('On login page, not initializing POS');
         return;
     }
     
     // Check if we have a valid token
     if (!authToken) {
-        // Only redirect if we haven't already attempted it
-        if (!redirectAttempted) {
+        // Only redirect if we haven't already attempted it and we're not already on login
+        if (!redirectAttempted && window.location.pathname !== '/login.html') {
             redirectAttempted = true;
             console.log('No auth token found, redirecting to login...');
+            // Clear any existing cookies
+            document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
             window.location.href = '/login.html';
         }
         return;

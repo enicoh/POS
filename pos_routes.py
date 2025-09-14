@@ -13,7 +13,7 @@ from models import (
     Order, OrderItem, OrderItemModifier, Payment, Role, PaymentMethod, OrderType, CashRegisterSession, Settings
 )
 from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
+import jwt as pyjwt
 import logging
 import re
 from io import BytesIO
@@ -50,7 +50,7 @@ def _require_auth(required_role=None):
                 return jsonify({'error': 'Authorization token required'}), 401
             try:
                 token = auth_header.split(' ')[1]
-                payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+                payload = pyjwt.decode(token, SECRET_KEY, algorithms=['HS256'])
                 user = db.session.get(User, payload['user_id'])
                 if not user or not user.is_active:
                     logger.error(f"Invalid or inactive user: user_id={payload['user_id']}")
@@ -60,10 +60,10 @@ def _require_auth(required_role=None):
                     return jsonify({'error': f'{required_role.value} role required'}), 403
                 request.user = user
                 return f(*args, **kwargs)
-            except jwt.ExpiredSignatureError:
+            except pyjwt.ExpiredSignatureError:
                 logger.error("Token expired")
                 return jsonify({'error': 'Token expired'}), 401
-            except jwt.InvalidTokenError:
+            except pyjwt.InvalidTokenError:
                 logger.error("Invalid token")
                 return jsonify({'error': 'Invalid token'}), 401
             except Exception as e:

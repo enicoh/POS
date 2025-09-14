@@ -25,6 +25,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (productSubmitBtn) {
         productSubmitBtn.onclick = addProduct;
     }
+    
+    // Reset category modal when it's hidden
+    const categoryModal = document.getElementById('addCategoryModal');
+    if (categoryModal) {
+        categoryModal.addEventListener('hidden.bs.modal', function() {
+            resetCategoryModal();
+        });
+    }
+    
+    // Set up initial category submit button
+    const categorySubmitBtn = document.getElementById('category-submit-btn');
+    if (categorySubmitBtn) {
+        categorySubmitBtn.onclick = addCategory;
+    }
 });
 
 // Authentication functions
@@ -396,7 +410,7 @@ async function addProduct() {
             low_stock_threshold: parseInt(document.getElementById('product-low-stock').value)
         };
         
-        await apiCallDirect('/api/products', 'POST', productData);
+        await apiCall('/admin/products', 'POST', productData);
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
         modal.hide();
@@ -444,6 +458,7 @@ async function loadCategories() {
 }
 
 function showAddCategoryModal() {
+    resetCategoryModal(); // This will reset the modal to add mode
     const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
     modal.show();
 }
@@ -1400,7 +1415,7 @@ async function updateProduct(productId) {
             low_stock_threshold: parseInt(document.getElementById('product-low-stock').value)
         };
         
-        await apiCallDirect(`/api/products/${productId}`, 'PUT', productData);
+        await apiCall(`/admin/products/${productId}`, 'PUT', productData);
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
         modal.hide();
@@ -1420,7 +1435,7 @@ async function updateProduct(productId) {
 async function deleteProduct(productId) {
     if (confirm('Are you sure you want to delete this product?')) {
         try {
-            await apiCallDirect(`/api/products/${productId}`, 'DELETE');
+            await apiCall(`/admin/products/${productId}`, 'DELETE');
             loadProducts();
             loadDashboard();
             alert('Product deleted successfully!');
@@ -1475,7 +1490,7 @@ async function editCategory(categoryId) {
         
         // Change modal title and button
         const titleEl = document.querySelector('#addCategoryModal .modal-title');
-        const buttonEl = document.querySelector('#addCategoryModal .btn-primary');
+        const buttonEl = document.getElementById('category-submit-btn');
         
         if (titleEl) titleEl.textContent = 'Edit Category';
         if (buttonEl) {
@@ -1503,10 +1518,7 @@ async function updateCategory(categoryId) {
         modal.hide();
         
         // Reset modal
-        document.querySelector('#addCategoryModal .modal-title').textContent = 'Add New Category';
-        document.querySelector('#addCategoryModal .btn-primary').textContent = 'Add Category';
-        document.querySelector('#addCategoryModal .btn-primary').onclick = addCategory;
-        document.getElementById('addCategoryForm').reset();
+        resetCategoryModal();
         
         loadCategories();
         
@@ -1641,4 +1653,19 @@ function resetProductModal() {
     // Clear form
     document.getElementById('addProductForm').reset();
     clearProductForm();
+}
+
+function resetCategoryModal() {
+    // Reset modal title and button to add mode
+    const titleEl = document.querySelector('#addCategoryModal .modal-title');
+    const buttonEl = document.getElementById('category-submit-btn');
+    
+    if (titleEl) titleEl.textContent = 'Add New Category';
+    if (buttonEl) {
+        buttonEl.textContent = 'Add Category';
+        buttonEl.onclick = addCategory;
+    }
+    
+    // Clear form
+    document.getElementById('addCategoryForm').reset();
 }

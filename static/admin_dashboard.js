@@ -437,9 +437,13 @@ async function loadCategoriesForSelect() {
         const categories = await apiCall('/categories');
         const select = document.getElementById('product-category');
         
+        console.log('Loading categories for select:', categories);
+        
         select.innerHTML = categories.map(category => 
             `<option value="${category.id}">${category.name}</option>`
         ).join('');
+        
+        console.log('Category options set:', Array.from(select.options).map(opt => ({ value: opt.value, text: opt.text })));
     } catch (error) {
         console.error('Error loading categories:', error);
     }
@@ -1429,10 +1433,6 @@ async function editProduct(productId) {
                 nameEl.value = product.name;
                 console.log('Name set to:', nameEl.value);
             }
-            if (categoryEl) {
-                categoryEl.value = product.category_id;
-                console.log('Category set to:', categoryEl.value);
-            }
             if (priceEl) {
                 priceEl.value = product.price;
                 console.log('Price set to:', priceEl.value);
@@ -1452,6 +1452,35 @@ async function editProduct(productId) {
             if (lowStockEl) {
                 lowStockEl.value = product.low_stock_threshold;
                 console.log('Low stock threshold set to:', lowStockEl.value);
+            }
+            
+            // Set category value after ensuring dropdown is populated
+            if (categoryEl) {
+                console.log('Available category options:', Array.from(categoryEl.options).map(opt => ({ value: opt.value, text: opt.text })));
+                console.log('Trying to set category to:', product.category_id, 'Type:', typeof product.category_id);
+                
+                // Try different value formats
+                let categoryValue = product.category_id;
+                if (typeof categoryValue === 'string') {
+                    categoryValue = parseInt(categoryValue);
+                }
+                
+                categoryEl.value = categoryValue;
+                console.log('Category set to:', categoryEl.value, 'Type:', typeof categoryEl.value);
+                
+                // If the value didn't set, try with string value
+                if (categoryEl.value != categoryValue) {
+                    categoryEl.value = String(product.category_id);
+                    console.log('Category retry with string:', categoryEl.value);
+                }
+                
+                // Final check and retry
+                if (categoryEl.value != product.category_id && categoryEl.value != String(product.category_id)) {
+                    setTimeout(() => {
+                        categoryEl.value = product.category_id;
+                        console.log('Category final retry set to:', categoryEl.value);
+                    }, 100);
+                }
             }
             
             // Show image preview if there's an image URL

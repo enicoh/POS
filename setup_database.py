@@ -22,7 +22,7 @@ try:
             # Create all tables
             print("Creating database tables...")
             db.create_all()
-            print("✓ Database tables created")
+            print("[OK] Database tables created")
             
             # Ensure admin user exists
             print("Setting up admin user...")
@@ -31,7 +31,7 @@ try:
                 admin.password_hash = generate_password_hash('admin')
                 admin.is_active = True
                 admin.role = Role.ADMIN
-                print("✓ Admin user updated")
+                print("[OK] Admin user updated")
             else:
                 admin = User(
                     username='admin', 
@@ -40,7 +40,7 @@ try:
                     is_active=True
                 )
                 db.session.add(admin)
-                print("✓ Admin user created")
+                print("[OK] Admin user created")
             
             # Ensure cashier user exists
             print("Setting up cashier user...")
@@ -49,7 +49,7 @@ try:
                 cashier.password_hash = generate_password_hash('seller')
                 cashier.is_active = True
                 cashier.role = Role.CASHIER
-                print("✓ Cashier user updated")
+                print("[OK] Cashier user updated")
             else:
                 cashier = User(
                     username='seller', 
@@ -58,21 +58,21 @@ try:
                     is_active=True
                 )
                 db.session.add(cashier)
-                print("✓ Cashier user created")
+                print("[OK] Cashier user created")
             
             # Commit changes
             db.session.commit()
-            print("✓ Database setup completed successfully")
+            print("[OK] Database setup completed successfully")
             
         except Exception as e:
-            print(f"❌ Database setup error: {e}")
+            print(f"[ERROR] Database setup error: {e}")
             db.session.rollback()
             sys.exit(1)
             
 except ImportError as e:
-    print(f"❌ Import error: {e}")
+    print(f"[ERROR] Import error: {e}")
     print("Make sure all dependencies are installed: pip install -r requirements.txt")
     sys.exit(1)
 except Exception as e:
-    print(f"❌ Unexpected error: {e}")
+    print(f"[ERROR] Unexpected error: {e}")
     sys.exit(1)

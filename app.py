@@ -140,4 +140,4 @@ if __name__ == '__main__':
             use_reloader=False  # Désactiver le reloader pour éviter la double exécution
         )
     except OSError as e:
-        logger.error(f"❌ Could not start server: {e}")
+        logger.error(f"[ERROR] Could not start server: {e}")

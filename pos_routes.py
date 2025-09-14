@@ -444,7 +444,7 @@ def create_order():
 
         order.items = order_items
         order.subtotal = subtotal
-        order.tax_amount = int(subtotal * 0.1)  # 10% tax - should be configurable
+        order.tax_amount = 0  # No automatic tax - can be added manually if needed
         order.total = subtotal + order.tax_amount
 
         db.session.add_all(order_items)

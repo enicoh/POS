@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, Response
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta, timezone
-from models import db, User, Category, Product, Sale, SaleItem, Role, PaymentMethod, CashRegisterSession
+from models import db, User, Category, Product, Sale, SaleItem, Role, PaymentMethod, CashRegisterSession, Order
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt as pyjwt
 import logging

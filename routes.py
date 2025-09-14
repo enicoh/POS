@@ -183,10 +183,19 @@ def update_category(category_id):
 @api.route('/categories', methods=['GET'])
 @_require_auth()
 def get_categories():
-    """Retrieve all active categories."""
+    """Retrieve all active categories with product counts."""
     logger.info("Processing get categories request")
     categories = db.session.query(Category).filter_by(is_active=True).all()
-    return jsonify([category.to_dict() for category in categories]), 200
+    
+    # Add product count for each category
+    categories_with_counts = []
+    for category in categories:
+        category_dict = category.to_dict()
+        product_count = db.session.query(Product).filter(Product.category_id == category.id).count()
+        category_dict['product_count'] = product_count
+        categories_with_counts.append(category_dict)
+    
+    return jsonify(categories_with_counts), 200
 
 # ---------- PRODUCTS ----------
 @api.route('/products', methods=['POST'])

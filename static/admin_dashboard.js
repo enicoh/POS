@@ -402,14 +402,14 @@ async function addProduct() {
 // Category functions
 async function loadCategories() {
     try {
-        const categories = await apiCall('/categories');
+        const categories = await apiCallDirect('/api/categories');
         const tableBody = document.getElementById('categories-table');
         
         tableBody.innerHTML = categories.map(category => `
             <tr>
                 <td>${category.name}</td>
                 <td>${category.description || 'No description'}</td>
-                <td>0</td> <!-- Product count would need separate API call -->
+                <td>${category.product_count || 0}</td>
                 <td>
                     <span class="badge bg-${category.is_active ? 'success' : 'secondary'}">
                         ${category.is_active ? 'Active' : 'Inactive'}
@@ -443,7 +443,7 @@ async function addCategory() {
             description: document.getElementById('category-description').value
         };
         
-        await apiCall('/categories', 'POST', categoryData);
+        await apiCallDirect('/api/categories', 'POST', categoryData);
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
         modal.hide();
@@ -1420,7 +1420,7 @@ async function deleteProduct(productId) {
 
 async function editCategory(categoryId) {
     try {
-        const categories = await apiCall('/categories');
+        const categories = await apiCallDirect('/api/categories');
         console.log('Categories data:', categories);
         console.log('Looking for category ID:', categoryId, 'Type:', typeof categoryId);
         
@@ -1484,7 +1484,7 @@ async function updateCategory(categoryId) {
             description: document.getElementById('category-description').value
         };
         
-        await apiCall(`/categories/${categoryId}`, 'PUT', categoryData);
+        await apiCallDirect(`/api/categories/${categoryId}`, 'PUT', categoryData);
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
         modal.hide();

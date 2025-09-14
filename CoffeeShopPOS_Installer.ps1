@@ -202,17 +202,13 @@ function Install-CoffeeShopPOS {
             Write-Log "Database setup completed"
         }
         
-        # Step 7: Populate sample data
-        $StatusLabel.Text = "Adding sample data..."
+        # Step 7: Skip sample data (clean installation)
+        $StatusLabel.Text = "Preparing clean installation..."
         $ProgressBar.Value = 90
         $Form.Refresh()
         
-        & "$script:InstallDir\venv\Scripts\python.exe" populate_sample_data.py
-        if ($LASTEXITCODE -ne 0) {
-            Write-Log "Sample data population failed, but continuing..." "WARNING"
-        } else {
-            Write-Log "Sample data added successfully"
-        }
+        Write-Log "Clean installation - no sample data will be added"
+        Write-Log "Users will need to add their own products and categories"
         
         # Step 8: Create shortcuts and launcher
         $StatusLabel.Text = "Creating shortcuts..."
@@ -248,6 +244,12 @@ pause
         $Shortcut.Save()
         
         Write-Log "Desktop shortcut created"
+        
+        # Copy uninstaller to installation directory
+        if (Test-Path "$script:SourceDir\Uninstall_CoffeeShopPOS.bat") {
+            Copy-Item "$script:SourceDir\Uninstall_CoffeeShopPOS.bat" "$script:InstallDir\Uninstall_CoffeeShopPOS.bat" -Force
+            Write-Log "Uninstaller copied to installation directory"
+        }
         
         # Step 9: Complete
         $StatusLabel.Text = "Installation completed!"
@@ -379,7 +381,7 @@ function Show-InstallerGUI {
         
         if ($success) {
             $result = [System.Windows.Forms.MessageBox]::Show(
-                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nWould you like to start the POS system now?",
+                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`nIMPORTANT: This is a clean installation with no sample data.`nYou will need to add your own products and categories.`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?",
                 "Installation Complete",
                 [System.Windows.Forms.MessageBoxButtons]::YesNo,
                 [System.Windows.Forms.MessageBoxIcon]::Information

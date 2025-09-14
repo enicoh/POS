@@ -156,15 +156,11 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: Populate sample data
+:: Skip sample data (clean installation)
 echo.
-echo [8/9] Adding sample data...
-python populate_sample_data.py >nul 2>&1
-if %errorlevel% neq 0 (
-    echo WARNING: Failed to populate sample data, but continuing...
-) else (
-    echo ✓ Sample data added
-)
+echo [8/9] Preparing clean installation...
+echo [INFO] Clean installation - no sample data will be added
+echo [INFO] Users will need to add their own products and categories
 
 :: Create start script and desktop shortcut
 echo.
@@ -342,6 +338,12 @@ echo echo. >> uninstall.bat
 echo pause >> uninstall.bat
 echo ✓ Uninstaller created
 
+:: Copy standalone uninstaller
+if exist "Uninstall_CoffeeShopPOS.bat" (
+    copy "Uninstall_CoffeeShopPOS.bat" "%INSTALL_DIR%\" >nul
+    echo ✓ Standalone uninstaller copied
+)
+
 :: Launch the application
 echo.
 echo ========================================
@@ -353,13 +355,16 @@ echo.
 echo Desktop shortcut created:
 echo - "Coffee Shop POS" (with coffee icon)
 echo.
+echo IMPORTANT: This is a clean installation with no sample data.
+echo You will need to add your own products and categories.
+echo.
 echo Default login credentials:
 echo Admin Dashboard: admin / admin
 echo Cashier POS: seller / seller
 echo.
 echo To start the system: Double-click "Coffee Shop POS" on your desktop
 echo To start manually: Go to %INSTALL_DIR% and run "start_pos.bat"
-echo To uninstall: Go to %INSTALL_DIR% and run "uninstall.bat"
+echo To uninstall: Run "Uninstall_CoffeeShopPOS.bat" in the installation folder
 echo.
 echo The system will now start automatically...
 echo.

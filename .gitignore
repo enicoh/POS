@@ -27,7 +27,6 @@ ENV/
 
 # Database
 instance/database.db
-*.db
 
 # Logs
 *.log
@@ -43,10 +42,18 @@ app.log
 .DS_Store
 Thumbs.db
 
-# Flask
-instance/
-.migrations/
-
 # Temporary files
 *.tmp
 *.temp
+*.bak
+*.backup
+*.old
+*.orig
+~*
+
+# Uploads directory (will be recreated)
+static/uploads/
+
+# Test files
+test_*.py
+*_test.py

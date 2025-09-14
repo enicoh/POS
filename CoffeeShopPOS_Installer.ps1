@@ -1,6 +1,6 @@
 # Coffee Shop POS System - Professional Installer
 # PowerShell GUI Installer with comprehensive error handling
-# Version: 2.2 - Enhanced UI & Dashboard Fixes
+# Version: 2.3 - Auto Browser Opening
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -217,6 +217,7 @@ function Install-CoffeeShopPOS {
         
         # Log latest improvements
         Write-Log "Latest improvements included - Enhanced admin dashboard and cashier modal UI"
+        Write-Log "Auto browser opening feature added - Web page will open automatically after installation"
         
         # Step 8: Create shortcuts and launcher
         $StatusLabel.Text = "Creating shortcuts..."
@@ -281,7 +282,7 @@ pause
 # Create the main form
 function Show-InstallerGUI {
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = "Coffee Shop POS - Professional Installer v2.2"
+    $form.Text = "Coffee Shop POS - Professional Installer v2.3"
     $form.Size = New-Object System.Drawing.Size(500, 400)
     $form.StartPosition = "CenterScreen"
     $form.FormBorderStyle = "FixedDialog"
@@ -389,14 +390,33 @@ function Show-InstallerGUI {
         
         if ($success) {
             $result = [System.Windows.Forms.MessageBox]::Show(
-                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`n✅ SAMPLE DATA INCLUDED:`n• 27 Coffee Shop Products`n• 8 Categories (Coffee, Tea, Milk, Juices, etc.)`n• Realistic pricing and stock levels`n• Ready to use immediately`n`n✅ LATEST FIXES INCLUDED:`n• Fixed admin dashboard data display`n• Fixed product edit functionality`n• Fixed category product counts`n• Fixed all API endpoints`n• Improved error handling`n• Enhanced cashier modal with visible +/- buttons`n• Added stock display in product modal`n• Added quantity validation against stock limits`n• Improved button styling and user experience`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?",
+                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`n✅ SAMPLE DATA INCLUDED:`n• 27 Coffee Shop Products`n• 8 Categories (Coffee, Tea, Milk, Juices, etc.)`n• Realistic pricing and stock levels`n• Ready to use immediately`n`n✅ LATEST FIXES INCLUDED:`n• Fixed admin dashboard data display`n• Fixed product edit functionality`n• Fixed category product counts`n• Fixed all API endpoints`n• Improved error handling`n• Enhanced cashier modal with visible +/- buttons`n• Added stock display in product modal`n• Added quantity validation against stock limits`n• Improved button styling and user experience`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?`n(The web browser will open automatically)",
                 "Installation Complete",
                 [System.Windows.Forms.MessageBoxButtons]::YesNo,
                 [System.Windows.Forms.MessageBoxIcon]::Information
             )
             
             if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
+                # Start the POS system
                 Start-Process "$script:InstallDir\start_pos.bat"
+                
+                # Wait a moment for the server to start
+                Start-Sleep -Seconds 3
+                
+                # Open the web browser automatically
+                try {
+                    Write-Log "Opening web browser to http://127.0.0.1:8080"
+                    Start-Process "http://127.0.0.1:8080"
+                    Write-Log "Web browser opened successfully"
+                } catch {
+                    Write-Log "Failed to open web browser automatically: $($_.Exception.Message)" "WARNING"
+                    [System.Windows.Forms.MessageBox]::Show(
+                        "The POS system has started, but the web browser couldn't open automatically.`n`nPlease open your browser and go to:`nhttp://127.0.0.1:8080`n`nOr use the desktop shortcut to start the system.",
+                        "Manual Browser Opening Required",
+                        [System.Windows.Forms.MessageBoxButtons]::OK,
+                        [System.Windows.Forms.MessageBoxIcon]::Information
+                    )
+                }
             }
         }
         

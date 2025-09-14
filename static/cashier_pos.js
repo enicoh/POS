@@ -344,7 +344,11 @@ function showProductModal(productId) {
     document.getElementById('modalProductName').textContent = selectedProduct.name;
     document.getElementById('modalProductDescription').textContent = selectedProduct.description || 'No description available';
     document.getElementById('modalQuantity').textContent = modalQuantity;
+    document.getElementById('modalStock').textContent = selectedProduct.stock || 0;
     document.getElementById('specialInstructions').value = '';
+    
+    // Update quantity buttons state
+    updateQuantityButtons();
     
     // Show/hide size options
     const sizeOptions = document.getElementById('sizeOptions');
@@ -404,14 +408,35 @@ function toggleModifier(modifierId) {
 }
 
 function increaseQuantity() {
-    modalQuantity++;
-    document.getElementById('modalQuantity').textContent = modalQuantity;
+    if (selectedProduct && modalQuantity < selectedProduct.stock) {
+        modalQuantity++;
+        document.getElementById('modalQuantity').textContent = modalQuantity;
+        updateQuantityButtons();
+    }
 }
 
 function decreaseQuantity() {
     if (modalQuantity > 1) {
         modalQuantity--;
         document.getElementById('modalQuantity').textContent = modalQuantity;
+        updateQuantityButtons();
+    }
+}
+
+function updateQuantityButtons() {
+    const increaseBtn = document.querySelector('.quantity-btn[onclick="increaseQuantity()"]');
+    const decreaseBtn = document.querySelector('.quantity-btn[onclick="decreaseQuantity()"]');
+    
+    if (selectedProduct) {
+        // Disable increase button if at stock limit
+        if (increaseBtn) {
+            increaseBtn.disabled = modalQuantity >= selectedProduct.stock;
+        }
+        
+        // Disable decrease button if at minimum
+        if (decreaseBtn) {
+            decreaseBtn.disabled = modalQuantity <= 1;
+        }
     }
 }
 

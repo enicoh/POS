@@ -227,9 +227,21 @@ async function loadDashboard() {
         
     } catch (error) {
         console.error('Error loading dashboard:', error);
-        // Fallback to show 0 values
-        document.getElementById('today-sales').textContent = 'DZD 0.00';
-        document.getElementById('total-orders').textContent = '0';
+        console.error('Dashboard error details:', error.message, error.stack);
+        
+        // Fallback to show 0 values for all stats
+        const totalProductsEl = document.getElementById('total-products');
+        const lowStockEl = document.getElementById('low-stock-count');
+        const todaySalesEl = document.getElementById('today-sales');
+        const totalOrdersEl = document.getElementById('total-orders');
+        
+        if (totalProductsEl) totalProductsEl.textContent = '0';
+        if (lowStockEl) lowStockEl.textContent = '0';
+        if (todaySalesEl) todaySalesEl.textContent = 'DZD 0.00';
+        if (totalOrdersEl) totalOrdersEl.textContent = '0';
+        
+        // Show error message to user
+        alert('Error loading dashboard data. Please check console for details.');
     }
 }
 

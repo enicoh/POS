@@ -185,11 +185,21 @@
 
                     <!-- Quantity -->
                     <div class="mb-3">
-                        <label class="form-label">Quantity:</label>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Quantity:</label>
+                            <span class="stock-info">
+                                <i class="fas fa-box me-1"></i>
+                                <span id="modalStock">0</span> in stock
+                            </span>
+                        </div>
                         <div class="quantity-controls">
-                            <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                            <span id="modalQuantity">1</span>
-                            <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+                            <button class="quantity-btn quantity-btn-large" onclick="decreaseQuantity()">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span id="modalQuantity" class="quantity-display">1</span>
+                            <button class="quantity-btn quantity-btn-large" onclick="increaseQuantity()">
+                                <i class="fas fa-plus"></i>
+                            </button>
                         </div>
                     </div>
                 </div>

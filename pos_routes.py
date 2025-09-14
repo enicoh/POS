@@ -972,11 +972,12 @@ def generate_sales_report_pdf():
     buffer.seek(0)
     
     # Return PDF
+    filename = f'sales_report_{start_date or "all"}_{end_date or "present"}.pdf'
     return Response(
         buffer.getvalue(),
         mimetype='application/pdf',
         headers={
-            'Content-Disposition': f'attachment; filename=sales_report_{start_date or "all"}_{end_date or "present"}.pdf'
+            'Content-Disposition': f'attachment; filename="{filename}"'
         }
     )
 

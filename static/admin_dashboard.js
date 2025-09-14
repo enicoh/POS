@@ -695,15 +695,41 @@ async function generateSalesReportPDF() {
             url += '?' + params.toString();
         }
         
-        // Create a temporary link to download the PDF
+        // Fetch the PDF with proper authentication
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Accept': 'application/pdf'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Check if the response is actually a PDF
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/pdf')) {
+            throw new Error('Response is not a PDF file');
+        }
+        
+        // Get the PDF data as a blob
+        const blob = await response.blob();
+        
+        // Create a blob URL and trigger download
+        const blobUrl = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = url;
+        link.href = blobUrl;
         link.download = `sales_report_${startDate || 'all'}_${endDate || 'present'}.pdf`;
         
         // Trigger download
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        // Clean up the blob URL
+        window.URL.revokeObjectURL(blobUrl);
         
     } catch (error) {
         console.error('Error generating PDF report:', error);

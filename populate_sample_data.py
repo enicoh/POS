@@ -14,9 +14,12 @@ def populate_sample_data():
         categories_data = [
             {'name': 'Coffee', 'description': 'Hot and cold coffee beverages'},
             {'name': 'Tea', 'description': 'Various tea options'},
-            {'name': 'Pastries', 'description': 'Fresh baked goods'},
+            {'name': 'Milk & Dairy', 'description': 'Milk, cream, and dairy products'},
+            {'name': 'Juices & Water', 'description': 'Fresh juices, water, and soft drinks'},
+            {'name': 'Pastries', 'description': 'Fresh baked goods and desserts'},
             {'name': 'Sandwiches', 'description': 'Fresh sandwiches and wraps'},
-            {'name': 'Smoothies', 'description': 'Fresh fruit smoothies'}
+            {'name': 'Smoothies', 'description': 'Fresh fruit smoothies and shakes'},
+            {'name': 'Snacks', 'description': 'Light snacks and treats'}
         ]
         
         # Create categories
@@ -28,83 +31,166 @@ def populate_sample_data():
         
         db.session.commit()
         
-        # Current products from database (after deletions)
+        # Comprehensive coffee shop products
         products_data = [
+            # COFFEE CATEGORY
             {
-                'name': 'Cookies',
-                'price': 140,
-                'stock': 2,
+                'name': 'Espresso',
+                'price': 80,
+                'stock': 50,
                 'category_name': 'Coffee',
-                'description': '',
-                'image_url': '/static/uploads/27a87853-541c-444e-9300-3bb3c797901c.png',
+                'description': 'Rich, full-bodied espresso shot',
+                'image_url': '/static/placeholder-coffee.svg',
                 'sizes': [
                     {'name': 'Single', 'price_modifier': 0},
                     {'name': 'Double', 'price_modifier': 20}
                 ],
-                'modifiers': []
+                'modifiers': [
+                    {'name': 'Decaf', 'price_modifier': 0},
+                    {'name': 'Extra Shot', 'price_modifier': 15}
+                ]
             },
             {
-                'name': 'Mocha',
-                'price': 100,
-                'stock': 24,
+                'name': 'Americano',
+                'price': 90,
+                'stock': 45,
                 'category_name': 'Coffee',
-                'description': 'Espresso with chocolate and steamed milk',
-                'image_url': 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300&h=300&fit=crop',
+                'description': 'Espresso with hot water',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small', 'price_modifier': 0},
+                    {'name': 'Medium', 'price_modifier': 15},
+                    {'name': 'Large', 'price_modifier': 30}
+                ],
+                'modifiers': [
+                    {'name': 'Decaf', 'price_modifier': 0},
+                    {'name': 'Extra Shot', 'price_modifier': 15}
+                ]
+            },
+            {
+                'name': 'Cappuccino',
+                'price': 120,
+                'stock': 40,
+                'category_name': 'Coffee',
+                'description': 'Espresso with steamed milk and foam',
+                'image_url': '/static/placeholder-coffee.svg',
                 'sizes': [
                     {'name': 'Small', 'price_modifier': 0},
                     {'name': 'Medium', 'price_modifier': 20},
                     {'name': 'Large', 'price_modifier': 40}
                 ],
                 'modifiers': [
-                    {'name': 'Extra Shot', 'price_modifier': 15},
                     {'name': 'Decaf', 'price_modifier': 0},
+                    {'name': 'Extra Shot', 'price_modifier': 15},
                     {'name': 'Oat Milk', 'price_modifier': 10},
                     {'name': 'Almond Milk', 'price_modifier': 10},
-                    {'name': 'Extra Chocolate', 'price_modifier': 10}
+                    {'name': 'Extra Foam', 'price_modifier': 5}
+                ]
+            },
+            {
+                'name': 'Latte',
+                'price': 130,
+                'stock': 35,
+                'category_name': 'Coffee',
+                'description': 'Espresso with steamed milk',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small', 'price_modifier': 0},
+                    {'name': 'Medium', 'price_modifier': 20},
+                    {'name': 'Large', 'price_modifier': 40}
+                ],
+                'modifiers': [
+                    {'name': 'Decaf', 'price_modifier': 0},
+                    {'name': 'Extra Shot', 'price_modifier': 15},
+                    {'name': 'Oat Milk', 'price_modifier': 10},
+                    {'name': 'Almond Milk', 'price_modifier': 10},
+                    {'name': 'Vanilla Syrup', 'price_modifier': 10},
+                    {'name': 'Caramel Syrup', 'price_modifier': 10}
+                ]
+            },
+            {
+                'name': 'Mocha',
+                'price': 150,
+                'stock': 30,
+                'category_name': 'Coffee',
+                'description': 'Espresso with chocolate and steamed milk',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small', 'price_modifier': 0},
+                    {'name': 'Medium', 'price_modifier': 20},
+                    {'name': 'Large', 'price_modifier': 40}
+                ],
+                'modifiers': [
+                    {'name': 'Decaf', 'price_modifier': 0},
+                    {'name': 'Extra Shot', 'price_modifier': 15},
+                    {'name': 'Oat Milk', 'price_modifier': 10},
+                    {'name': 'Almond Milk', 'price_modifier': 10},
+                    {'name': 'Extra Chocolate', 'price_modifier': 10},
+                    {'name': 'Whipped Cream', 'price_modifier': 15}
                 ]
             },
             {
                 'name': 'Iced Coffee',
-                'price': 70,
-                'stock': 16,
+                'price': 100,
+                'stock': 25,
                 'category_name': 'Coffee',
                 'description': 'Cold brewed coffee served over ice',
-                'image_url': '/static/uploads/a4d95b69-464e-4e67-9aea-0535f7eb1d07.png',
+                'image_url': '/static/placeholder-coffee.svg',
                 'sizes': [
                     {'name': 'Small', 'price_modifier': 0},
                     {'name': 'Medium', 'price_modifier': 20},
                     {'name': 'Large', 'price_modifier': 40}
                 ],
                 'modifiers': [
-                    {'name': 'Extra Shot', 'price_modifier': 15},
                     {'name': 'Decaf', 'price_modifier': 0},
+                    {'name': 'Extra Shot', 'price_modifier': 15},
                     {'name': 'Oat Milk', 'price_modifier': 10},
                     {'name': 'Almond Milk', 'price_modifier': 10},
-                    {'name': 'Vanilla Syrup', 'price_modifier': 5}
+                    {'name': 'Vanilla Syrup', 'price_modifier': 10},
+                    {'name': 'Caramel Syrup', 'price_modifier': 10}
                 ]
             },
+            
+            # TEA CATEGORY
             {
                 'name': 'Green Tea',
-                'price': 40,
-                'stock': 50,
+                'price': 60,
+                'stock': 40,
                 'category_name': 'Tea',
                 'description': 'Premium green tea leaves',
-                'image_url': 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300&h=300&fit=crop',
+                'image_url': '/static/placeholder-coffee.svg',
                 'sizes': [
                     {'name': 'Regular', 'price_modifier': 0}
                 ],
                 'modifiers': [
                     {'name': 'Honey', 'price_modifier': 10},
-                    {'name': 'Lemon', 'price_modifier': 5}
+                    {'name': 'Lemon', 'price_modifier': 5},
+                    {'name': 'Ginger', 'price_modifier': 5}
+                ]
+            },
+            {
+                'name': 'Black Tea',
+                'price': 60,
+                'stock': 35,
+                'category_name': 'Tea',
+                'description': 'Classic black tea',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Regular', 'price_modifier': 0}
+                ],
+                'modifiers': [
+                    {'name': 'Honey', 'price_modifier': 10},
+                    {'name': 'Lemon', 'price_modifier': 5},
+                    {'name': 'Milk', 'price_modifier': 5}
                 ]
             },
             {
                 'name': 'Chai Latte',
-                'price': 60,
-                'stock': 35,
+                'price': 110,
+                'stock': 30,
                 'category_name': 'Tea',
                 'description': 'Spiced tea with steamed milk',
-                'image_url': 'https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=300&h=300&fit=crop',
+                'image_url': '/static/placeholder-coffee.svg',
                 'sizes': [
                     {'name': 'Small', 'price_modifier': 0},
                     {'name': 'Medium', 'price_modifier': 15},
@@ -113,30 +199,262 @@ def populate_sample_data():
                 'modifiers': [
                     {'name': 'Oat Milk', 'price_modifier': 10},
                     {'name': 'Almond Milk', 'price_modifier': 10},
-                    {'name': 'Extra Spice', 'price_modifier': 5}
+                    {'name': 'Extra Spice', 'price_modifier': 5},
+                    {'name': 'Honey', 'price_modifier': 10}
+                ]
+            },
+            {
+                'name': 'Herbal Tea',
+                'price': 70,
+                'stock': 25,
+                'category_name': 'Tea',
+                'description': 'Caffeine-free herbal blend',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Regular', 'price_modifier': 0}
+                ],
+                'modifiers': [
+                    {'name': 'Honey', 'price_modifier': 10},
+                    {'name': 'Lemon', 'price_modifier': 5}
+                ]
+            },
+            
+            # MILK & DAIRY CATEGORY
+            {
+                'name': 'Fresh Milk',
+                'price': 40,
+                'stock': 100,
+                'category_name': 'Milk & Dairy',
+                'description': 'Fresh whole milk',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small Glass', 'price_modifier': 0},
+                    {'name': 'Large Glass', 'price_modifier': 20}
+                ],
+                'modifiers': []
+            },
+            {
+                'name': 'Oat Milk',
+                'price': 50,
+                'stock': 80,
+                'category_name': 'Milk & Dairy',
+                'description': 'Plant-based oat milk',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small Glass', 'price_modifier': 0},
+                    {'name': 'Large Glass', 'price_modifier': 20}
+                ],
+                'modifiers': []
+            },
+            {
+                'name': 'Almond Milk',
+                'price': 50,
+                'stock': 70,
+                'category_name': 'Milk & Dairy',
+                'description': 'Plant-based almond milk',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small Glass', 'price_modifier': 0},
+                    {'name': 'Large Glass', 'price_modifier': 20}
+                ],
+                'modifiers': []
+            },
+            
+            # JUICES & WATER CATEGORY
+            {
+                'name': 'Orange Juice',
+                'price': 80,
+                'stock': 60,
+                'category_name': 'Juices & Water',
+                'description': 'Fresh squeezed orange juice',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small', 'price_modifier': 0},
+                    {'name': 'Large', 'price_modifier': 30}
+                ],
+                'modifiers': []
+            },
+            {
+                'name': 'Apple Juice',
+                'price': 70,
+                'stock': 50,
+                'category_name': 'Juices & Water',
+                'description': 'Fresh apple juice',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small', 'price_modifier': 0},
+                    {'name': 'Large', 'price_modifier': 30}
+                ],
+                'modifiers': []
+            },
+            {
+                'name': 'Bottled Water',
+                'price': 30,
+                'stock': 200,
+                'category_name': 'Juices & Water',
+                'description': 'Pure spring water',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': '500ml', 'price_modifier': 0},
+                    {'name': '1L', 'price_modifier': 10}
+                ],
+                'modifiers': []
+            },
+            {
+                'name': 'Sparkling Water',
+                'price': 40,
+                'stock': 100,
+                'category_name': 'Juices & Water',
+                'description': 'Refreshing sparkling water',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': '330ml', 'price_modifier': 0},
+                    {'name': '500ml', 'price_modifier': 10}
+                ],
+                'modifiers': []
+            },
+            
+            # PASTRIES CATEGORY
+            {
+                'name': 'Croissant',
+                'price': 80,
+                'stock': 20,
+                'category_name': 'Pastries',
+                'description': 'Fresh baked buttery croissant',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [],
+                'modifiers': [
+                    {'name': 'Plain', 'price_modifier': 0},
+                    {'name': 'Chocolate', 'price_modifier': 15},
+                    {'name': 'Almond', 'price_modifier': 20}
                 ]
             },
             {
                 'name': 'Muffin',
-                'price': 50,
-                'stock': 8,
+                'price': 90,
+                'stock': 15,
                 'category_name': 'Pastries',
                 'description': 'Fresh baked muffin',
-                'image_url': 'https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=300&h=300&fit=crop',
+                'image_url': '/static/placeholder-coffee.svg',
                 'sizes': [],
                 'modifiers': [
                     {'name': 'Blueberry', 'price_modifier': 0},
-                    {'name': 'Chocolate Chip', 'price_modifier': 5},
-                    {'name': 'Banana Nut', 'price_modifier': 5}
+                    {'name': 'Chocolate Chip', 'price_modifier': 10},
+                    {'name': 'Banana Nut', 'price_modifier': 10}
                 ]
             },
             {
-                'name': 'Pokemon',
-                'price': 123,
-                'stock': 200,
+                'name': 'Danish Pastry',
+                'price': 100,
+                'stock': 12,
                 'category_name': 'Pastries',
-                'description': '',
-                'image_url': '/static/uploads/207810aa-74cb-4ba8-b661-4761c0041357.png',
+                'description': 'Flaky pastry with sweet filling',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [],
+                'modifiers': [
+                    {'name': 'Apple', 'price_modifier': 0},
+                    {'name': 'Cherry', 'price_modifier': 5},
+                    {'name': 'Cheese', 'price_modifier': 10}
+                ]
+            },
+            {
+                'name': 'Chocolate Cake',
+                'price': 150,
+                'stock': 8,
+                'category_name': 'Pastries',
+                'description': 'Rich chocolate cake slice',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [],
+                'modifiers': []
+            },
+            
+            # SANDWICHES CATEGORY
+            {
+                'name': 'Turkey Sandwich',
+                'price': 180,
+                'stock': 10,
+                'category_name': 'Sandwiches',
+                'description': 'Fresh turkey with lettuce and tomato',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [],
+                'modifiers': [
+                    {'name': 'White Bread', 'price_modifier': 0},
+                    {'name': 'Whole Wheat', 'price_modifier': 5},
+                    {'name': 'Extra Turkey', 'price_modifier': 20},
+                    {'name': 'Add Cheese', 'price_modifier': 15}
+                ]
+            },
+            {
+                'name': 'Veggie Wrap',
+                'price': 160,
+                'stock': 8,
+                'category_name': 'Sandwiches',
+                'description': 'Fresh vegetables in a tortilla wrap',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [],
+                'modifiers': [
+                    {'name': 'Hummus', 'price_modifier': 10},
+                    {'name': 'Avocado', 'price_modifier': 15},
+                    {'name': 'Extra Veggies', 'price_modifier': 10}
+                ]
+            },
+            
+            # SMOOTHIES CATEGORY
+            {
+                'name': 'Berry Smoothie',
+                'price': 120,
+                'stock': 20,
+                'category_name': 'Smoothies',
+                'description': 'Mixed berries with yogurt',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small', 'price_modifier': 0},
+                    {'name': 'Large', 'price_modifier': 30}
+                ],
+                'modifiers': [
+                    {'name': 'Protein Powder', 'price_modifier': 20},
+                    {'name': 'Extra Berries', 'price_modifier': 15}
+                ]
+            },
+            {
+                'name': 'Banana Smoothie',
+                'price': 100,
+                'stock': 25,
+                'category_name': 'Smoothies',
+                'description': 'Creamy banana smoothie',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [
+                    {'name': 'Small', 'price_modifier': 0},
+                    {'name': 'Large', 'price_modifier': 30}
+                ],
+                'modifiers': [
+                    {'name': 'Honey', 'price_modifier': 10},
+                    {'name': 'Chocolate', 'price_modifier': 15}
+                ]
+            },
+            
+            # SNACKS CATEGORY
+            {
+                'name': 'Cookies',
+                'price': 60,
+                'stock': 30,
+                'category_name': 'Snacks',
+                'description': 'Fresh baked cookies',
+                'image_url': '/static/placeholder-coffee.svg',
+                'sizes': [],
+                'modifiers': [
+                    {'name': 'Chocolate Chip', 'price_modifier': 0},
+                    {'name': 'Oatmeal Raisin', 'price_modifier': 5},
+                    {'name': 'Sugar Cookie', 'price_modifier': 5}
+                ]
+            },
+            {
+                'name': 'Granola Bar',
+                'price': 40,
+                'stock': 50,
+                'category_name': 'Snacks',
+                'description': 'Healthy granola bar',
+                'image_url': '/static/placeholder-coffee.svg',
                 'sizes': [],
                 'modifiers': []
             }

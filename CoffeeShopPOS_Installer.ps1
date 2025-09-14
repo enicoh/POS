@@ -210,6 +210,7 @@ function Install-CoffeeShopPOS {
         
         Write-Log "Clean installation - no sample data will be added"
         Write-Log "Users will need to add their own products and categories"
+        Write-Log "Project cleaned - unnecessary files removed for optimal installation"
         
         # Step 8: Create shortcuts and launcher
         $StatusLabel.Text = "Creating shortcuts..."

@@ -695,43 +695,15 @@ async function generateSalesReportPDF() {
             url += '?' + params.toString();
         }
         
-        console.log('Generating PDF report with URL:', url);
-        console.log('Auth token:', authToken ? 'Present' : 'Missing');
-        
-        // Use the same authentication method as other API calls
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        console.log('PDF response status:', response.status);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('PDF generation error:', errorText);
-            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
-        }
-        
-        const blob = await response.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
-        
         // Create a temporary link to download the PDF
         const link = document.createElement('a');
-        link.href = downloadUrl;
+        link.href = url;
         link.download = `sales_report_${startDate || 'all'}_${endDate || 'present'}.pdf`;
         
         // Trigger download
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
-        // Clean up the URL object
-        window.URL.revokeObjectURL(downloadUrl);
-        
-        console.log('PDF report generated successfully');
         
     } catch (error) {
         console.error('Error generating PDF report:', error);

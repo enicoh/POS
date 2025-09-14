@@ -695,31 +695,33 @@ async function generateSalesReportPDF() {
             url += '?' + params.toString();
         }
         
+        console.log('Generating PDF report with URL:', url);
+        console.log('Auth token:', authToken ? 'Present' : 'Missing');
+        
+        // Use the same authentication method as other API calls
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('PDF response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('PDF generation error:', errorText);
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        }
+        
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        
         // Create a temporary link to download the PDF
         const link = document.createElement('a');
-        link.href = url;
+        link.href = downloadUrl;
         link.download = `sales_report_${startDate || 'all'}_${endDate || 'present'}.pdf`;
-        
-        // Add authorization header
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            // We need to use fetch with headers for authentication
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
-            link.href = downloadUrl;
-        }
         
         // Trigger download
         document.body.appendChild(link);
@@ -727,9 +729,9 @@ async function generateSalesReportPDF() {
         document.body.removeChild(link);
         
         // Clean up the URL object
-        if (link.href.startsWith('blob:')) {
-            window.URL.revokeObjectURL(link.href);
-        }
+        window.URL.revokeObjectURL(downloadUrl);
+        
+        console.log('PDF report generated successfully');
         
     } catch (error) {
         console.error('Error generating PDF report:', error);

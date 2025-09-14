@@ -1,5 +1,6 @@
 # Coffee Shop POS System - Professional Installer
 # PowerShell GUI Installer with comprehensive error handling
+# Version: 2.1 - Latest Fixes Included
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -273,7 +274,7 @@ pause
 # Create the main form
 function Show-InstallerGUI {
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = "Coffee Shop POS - Professional Installer"
+    $form.Text = "Coffee Shop POS - Professional Installer v2.1"
     $form.Size = New-Object System.Drawing.Size(500, 400)
     $form.StartPosition = "CenterScreen"
     $form.FormBorderStyle = "FixedDialog"
@@ -343,7 +344,7 @@ function Show-InstallerGUI {
     $form.Controls.Add($featuresLabel)
     
     $featuresList = New-Object System.Windows.Forms.Label
-    $featuresList.Text = "• Admin Dashboard`n• Cashier POS Interface`n• Order Management`n• PDF Reports`n• Product Images`n• One-Click Installation"
+    $featuresList.Text = "• Admin Dashboard (Fixed Data Display)`n• Cashier POS Interface`n• Product Edit Functionality`n• Category Management`n• Order Management`n• PDF Reports`n• Product Images`n• One-Click Installation"
     $featuresList.Size = New-Object System.Drawing.Size(450, 80)
     $featuresList.Location = New-Object System.Drawing.Point(20, 230)
     $form.Controls.Add($featuresList)
@@ -381,7 +382,7 @@ function Show-InstallerGUI {
         
         if ($success) {
             $result = [System.Windows.Forms.MessageBox]::Show(
-                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`nIMPORTANT: This is a clean installation with no sample data.`nYou will need to add your own products and categories.`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?",
+                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`nIMPORTANT: This is a clean installation with no sample data.`nYou will need to add your own products and categories.`n`n✅ LATEST FIXES INCLUDED:`n• Fixed admin dashboard data display`n• Fixed product edit functionality`n• Fixed category product counts`n• Fixed all API endpoints`n• Improved error handling`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?",
                 "Installation Complete",
                 [System.Windows.Forms.MessageBoxButtons]::YesNo,
                 [System.Windows.Forms.MessageBoxIcon]::Information

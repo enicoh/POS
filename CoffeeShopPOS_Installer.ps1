@@ -203,14 +203,17 @@ function Install-CoffeeShopPOS {
             Write-Log "Database setup completed"
         }
         
-        # Step 7: Skip sample data (clean installation)
-        $StatusLabel.Text = "Preparing clean installation..."
+        # Step 7: Add sample data
+        $StatusLabel.Text = "Adding sample products and categories..."
         $ProgressBar.Value = 90
         $Form.Refresh()
         
-        Write-Log "Clean installation - no sample data will be added"
-        Write-Log "Users will need to add their own products and categories"
-        Write-Log "Project cleaned - unnecessary files removed for optimal installation"
+        & "$script:InstallDir\venv\Scripts\python.exe" populate_sample_data.py
+        if ($LASTEXITCODE -ne 0) {
+            Write-Log "Sample data population failed, but continuing..." "WARNING"
+        } else {
+            Write-Log "Sample data added successfully - 27 products and 8 categories"
+        }
         
         # Step 8: Create shortcuts and launcher
         $StatusLabel.Text = "Creating shortcuts..."
@@ -345,7 +348,7 @@ function Show-InstallerGUI {
     $form.Controls.Add($featuresLabel)
     
     $featuresList = New-Object System.Windows.Forms.Label
-    $featuresList.Text = "• Admin Dashboard (Fixed Data Display)`n• Cashier POS Interface`n• Product Edit Functionality`n• Category Management`n• Order Management`n• PDF Reports`n• Product Images`n• One-Click Installation"
+    $featuresList.Text = "• Admin Dashboard (Fixed Data Display)`n• Cashier POS Interface`n• 27 Sample Products & 8 Categories`n• Product Edit Functionality`n• Category Management`n• Order Management`n• PDF Reports`n• One-Click Installation"
     $featuresList.Size = New-Object System.Drawing.Size(450, 80)
     $featuresList.Location = New-Object System.Drawing.Point(20, 230)
     $form.Controls.Add($featuresList)
@@ -383,7 +386,7 @@ function Show-InstallerGUI {
         
         if ($success) {
             $result = [System.Windows.Forms.MessageBox]::Show(
-                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`nIMPORTANT: This is a clean installation with no sample data.`nYou will need to add your own products and categories.`n`n✅ LATEST FIXES INCLUDED:`n• Fixed admin dashboard data display`n• Fixed product edit functionality`n• Fixed category product counts`n• Fixed all API endpoints`n• Improved error handling`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?",
+                "Installation completed successfully!`n`nThe Coffee Shop POS system has been installed to:`n$script:InstallDir`n`nA desktop shortcut has been created.`n`n✅ SAMPLE DATA INCLUDED:`n• 27 Coffee Shop Products`n• 8 Categories (Coffee, Tea, Milk, Juices, etc.)`n• Realistic pricing and stock levels`n• Ready to use immediately`n`n✅ LATEST FIXES INCLUDED:`n• Fixed admin dashboard data display`n• Fixed product edit functionality`n• Fixed category product counts`n• Fixed all API endpoints`n• Improved error handling`n`nDefault login credentials:`nAdmin: admin / admin`nCashier: seller / seller`n`nTo uninstall: Run Uninstall_CoffeeShopPOS.bat in the installation folder`n`nWould you like to start the POS system now?",
                 "Installation Complete",
                 [System.Windows.Forms.MessageBoxButtons]::YesNo,
                 [System.Windows.Forms.MessageBoxIcon]::Information

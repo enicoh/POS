@@ -57,6 +57,35 @@ async function apiCall(endpoint, method = 'GET', data = null) {
     }
 }
 
+async function apiCallDirect(endpoint, method = 'GET', data = null) {
+    const config = {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+        }
+    };
+    
+    if (data) {
+        config.body = JSON.stringify(data);
+    }
+    
+    try {
+        const response = await fetch(endpoint, config);
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'API call failed');
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('API Error:', error);
+        console.error('API Error details:', error.message, error.stack);
+        throw error;
+    }
+}
+
 // Navigation functions
 function showSection(sectionName) {
     // Hide all sections
@@ -114,8 +143,10 @@ function showSection(sectionName) {
 // Dashboard functions
 async function loadDashboard() {
     try {
+        console.log('Loading dashboard...');
         // Load dashboard statistics
-        const stats = await apiCall('/dashboard/stats');
+        const stats = await apiCallDirect('/api/dashboard/stats');
+        console.log('Dashboard stats received:', stats);
         
         // Update stats
         document.getElementById('total-products').textContent = stats.total_products;
@@ -124,24 +155,31 @@ async function loadDashboard() {
         document.getElementById('total-orders').textContent = stats.today_orders;
         
         // Load inventory for low stock products
-        const inventory = await apiCall('/admin/inventory');
-        
-        // Load low stock products
-        const lowStockList = document.getElementById('low-stock-list');
-        if (inventory.low_stock_products.length === 0) {
-            lowStockList.innerHTML = '<p class="text-muted">No low stock products</p>';
-        } else {
-            lowStockList.innerHTML = inventory.low_stock_products.map(product => `
-                <div class="alert alert-warning d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${product.name}</strong> - ${product.stock} remaining
-                        <br><small class="text-muted">Threshold: ${product.low_stock_threshold}</small>
+        try {
+            const inventory = await apiCall('/admin/inventory');
+            console.log('Inventory received:', inventory);
+            
+            // Load low stock products
+            const lowStockList = document.getElementById('low-stock-list');
+            if (inventory.low_stock_products.length === 0) {
+                lowStockList.innerHTML = '<p class="text-muted">No low stock products</p>';
+            } else {
+                lowStockList.innerHTML = inventory.low_stock_products.map(product => `
+                    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${product.name}</strong> - ${product.stock} remaining
+                            <br><small class="text-muted">Threshold: ${product.low_stock_threshold}</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-warning" onclick="updateStockForProduct(${product.id}, '${product.name}', ${product.stock})">
+                            Update Stock
+                        </button>
                     </div>
-                    <button class="btn btn-sm btn-outline-warning" onclick="updateStockForProduct(${product.id}, '${product.name}', ${product.stock})">
-                        Update Stock
-                    </button>
-                </div>
-            `).join('');
+                `).join('');
+            }
+        } catch (inventoryError) {
+            console.error('Error loading inventory:', inventoryError);
+            const lowStockList = document.getElementById('low-stock-list');
+            lowStockList.innerHTML = '<p class="text-danger">Error loading inventory</p>';
         }
         
     } catch (error) {

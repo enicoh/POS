@@ -70,4 +70,8 @@ Run `Uninstall_CoffeeShopPOS.bat` (in the installation folder) to completely rem
 - Python 3.8+ (auto-detected)
 - Internet connection (for setup)
 
+## Credits
+
+Special thanks to [@Mazdiou](https://github.com/Mazdiou) for helping create the Python API that powers this Coffee Shop POS system.
+
 Clean, simple, and ready to use!

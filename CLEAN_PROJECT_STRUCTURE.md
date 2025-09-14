@@ -36,7 +36,7 @@ I've removed all unnecessary files and organized your project. Here's what you n
 - `CoffeeShopPOS_Installer.ps1` - **Main GUI installer** (Recommended)
 - `Install_CoffeeShopPOS.bat` - **Simple launcher** for the GUI installer
 - `Create_Installer_Exe.ps1` - Script to create standalone EXE
-- `install_fallback.bat` - **Fallback installer** (renamed from install.bat)
+- `Uninstall_CoffeeShopPOS.bat` - **Complete uninstaller**
 
 ## 📚 **Documentation** (Essential)
 - `README.md` - Main project documentation

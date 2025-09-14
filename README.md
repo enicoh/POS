@@ -4,7 +4,7 @@ A clean, one-click Point of Sale system for coffee shops.
 
 ## Quick Start
 
-1. **Double-click** `install.bat` to install everything
+1. **Double-click** `Install_CoffeeShopPOS.bat` to install everything
 2. **The installer will**:
    - Create a dedicated folder: `%USERPROFILE%\CoffeeShopPOS`
    - Set up everything automatically
@@ -29,8 +29,9 @@ A clean, one-click Point of Sale system for coffee shops.
 - `static/` - CSS, JavaScript, images, uploads
 
 ### Installer & Launcher
-- `install.bat` - One-click installer
-- `uninstall.bat` - Complete uninstaller
+- `Install_CoffeeShopPOS.bat` - Simple launcher for GUI installer
+- `CoffeeShopPOS_Installer.ps1` - Professional GUI installer
+- `Uninstall_CoffeeShopPOS.bat` - Complete uninstaller
 
 **Note**: `start_pos.bat` is created automatically during installation in the POS folder.
 
@@ -61,7 +62,7 @@ The installer creates a clean, dedicated folder with everything needed:
 
 ## Uninstalling
 
-Run `uninstall.bat` (from anywhere) to completely remove everything.
+Run `Uninstall_CoffeeShopPOS.bat` (in the installation folder) to completely remove everything.
 
 ## Requirements
 

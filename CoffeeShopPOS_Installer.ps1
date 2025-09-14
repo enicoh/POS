@@ -1,6 +1,6 @@
 # Coffee Shop POS System - Professional Installer
 # PowerShell GUI Installer with comprehensive error handling
-# Version: 2.3 - Auto Browser Opening
+# Version: 2.4 - Fixed Desktop Launcher & Infinite Refresh
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -218,6 +218,8 @@ function Install-CoffeeShopPOS {
         # Log latest improvements
         Write-Log "Latest improvements included - Enhanced admin dashboard and cashier modal UI"
         Write-Log "Auto browser opening feature added - Web page will open automatically after installation"
+        Write-Log "Desktop launcher fixed - .bat file now opens browser automatically"
+        Write-Log "Infinite refresh bug fixed - Improved authentication logic"
         
         # Step 8: Create shortcuts and launcher
         $StatusLabel.Text = "Creating shortcuts..."
@@ -238,7 +240,21 @@ echo Starting POS System...
 echo.
 cd /d "$script:InstallDir"
 call venv\Scripts\activate.bat
-python app.py
+echo.
+echo Starting server in background...
+start /B python app.py
+echo.
+echo Waiting for server to start...
+timeout /t 5 /nobreak >nul
+echo.
+echo Opening web browser...
+start http://127.0.0.1:8080
+echo.
+echo Coffee Shop POS is now running!
+echo Web browser should open automatically.
+echo.
+echo To stop the server, close this window.
+echo.
 pause
 "@
         
@@ -282,7 +298,7 @@ pause
 # Create the main form
 function Show-InstallerGUI {
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = "Coffee Shop POS - Professional Installer v2.3"
+    $form.Text = "Coffee Shop POS - Professional Installer v2.4"
     $form.Size = New-Object System.Drawing.Size(500, 400)
     $form.StartPosition = "CenterScreen"
     $form.FormBorderStyle = "FixedDialog"

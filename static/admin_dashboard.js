@@ -6,15 +6,23 @@ let redirectAttempted = false;
 // Initialize the dashboard
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're already on the login page to prevent infinite redirects
-    if (window.location.pathname === '/login.html') {
+    if (window.location.pathname === '/login.html' || window.location.pathname === '/') {
         return;
     }
     
-    if (!authToken && !redirectAttempted) {
-        redirectAttempted = true;
-        window.location.href = '/login.html';
+    // Check if we have a valid token
+    if (!authToken) {
+        // Only redirect if we haven't already attempted it
+        if (!redirectAttempted) {
+            redirectAttempted = true;
+            console.log('No auth token found, redirecting to login...');
+            window.location.href = '/login.html';
+        }
         return;
     }
+    
+    // If we have a token, proceed with initialization
+    console.log('Auth token found, initializing dashboard...');
     
     loadUserInfo();
     loadDashboard();

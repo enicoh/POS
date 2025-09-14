@@ -12,7 +12,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserInfo();
     loadDashboard();
     
-    
+    // Reset product modal when it's hidden
+    const productModal = document.getElementById('addProductModal');
+    if (productModal) {
+        productModal.addEventListener('hidden.bs.modal', function() {
+            resetProductModal();
+        });
+    }
 });
 
 // Authentication functions
@@ -384,7 +390,7 @@ async function addProduct() {
             low_stock_threshold: parseInt(document.getElementById('product-low-stock').value)
         };
         
-        await apiCall('/admin/products', 'POST', productData);
+        await apiCallDirect('/api/products', 'POST', productData);
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
         modal.hide();
@@ -1359,10 +1365,14 @@ async function editProduct(productId) {
         const titleEl = document.querySelector('#addProductModal .modal-title');
         const buttonEl = document.querySelector('#addProductModal .btn-primary');
         
-        if (titleEl) titleEl.textContent = 'Edit Product';
+        if (titleEl) {
+            titleEl.textContent = 'Edit Product';
+            console.log('Modal title changed to: Edit Product');
+        }
         if (buttonEl) {
             buttonEl.textContent = 'Update Product';
             buttonEl.onclick = () => updateProduct(productId);
+            console.log('Button text changed to: Update Product, onclick set to updateProduct');
         }
         
     } catch (error) {
@@ -1384,16 +1394,13 @@ async function updateProduct(productId) {
             low_stock_threshold: parseInt(document.getElementById('product-low-stock').value)
         };
         
-        await apiCall(`/admin/products/${productId}`, 'PUT', productData);
+        await apiCallDirect(`/api/products/${productId}`, 'PUT', productData);
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
         modal.hide();
         
         // Reset modal
-        document.querySelector('#addProductModal .modal-title').textContent = 'Add New Product';
-        document.querySelector('#addProductModal .btn-primary').textContent = 'Add Product';
-        document.querySelector('#addProductModal .btn-primary').onclick = addProduct;
-        document.getElementById('addProductForm').reset();
+        resetProductModal();
         
         loadProducts();
         loadDashboard();
@@ -1407,7 +1414,7 @@ async function updateProduct(productId) {
 async function deleteProduct(productId) {
     if (confirm('Are you sure you want to delete this product?')) {
         try {
-            await apiCall(`/admin/products/${productId}`, 'DELETE');
+            await apiCallDirect(`/api/products/${productId}`, 'DELETE');
             loadProducts();
             loadDashboard();
             alert('Product deleted successfully!');
@@ -1612,4 +1619,20 @@ function clearProductForm() {
     document.getElementById('product-image-file').value = '';
     document.getElementById('product-image-url').value = '';
     hideImagePreview();
+}
+
+function resetProductModal() {
+    // Reset modal title and button to add mode
+    const titleEl = document.querySelector('#addProductModal .modal-title');
+    const buttonEl = document.querySelector('#addProductModal .btn-primary');
+    
+    if (titleEl) titleEl.textContent = 'Add New Product';
+    if (buttonEl) {
+        buttonEl.textContent = 'Add Product';
+        buttonEl.onclick = addProduct;
+    }
+    
+    // Clear form
+    document.getElementById('addProductForm').reset();
+    clearProductForm();
 }

@@ -70,10 +70,7 @@ function loadUserInfo() {
     document.getElementById('admin-name').textContent = currentUser.username;
 }
 
-function logout() {
-    localStorage.removeItem('authToken');
-    window.location.href = '/login.html';
-}
+// Single logout definition (moved to the bottom of file). Duplicate removed.
 
 // API helper functions
 async function apiCall(endpoint, method = 'GET', data = null) {

@@ -183,10 +183,7 @@ function loadUserInfo() {
     document.getElementById('cashier-name').textContent = currentUser.username;
 }
 
-function logout() {
-    localStorage.removeItem('authToken');
-    window.location.href = '/login.html';
-}
+// Single logout definition (moved to the bottom of file). Duplicate removed.
 
 // Cash register session management
 async function ensureCashRegisterSession() {

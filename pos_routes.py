@@ -549,7 +549,7 @@ def get_orders():
     logger.info("Processing get orders request")
     status = request.args.get('status')
     start_date = request.args.get('start_date')
-    end_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
 
     query = db.session.query(Order)
     
@@ -1253,7 +1253,7 @@ def generate_sales_report_pdf_download():
 
     doc.build(story)
     buffer.seek(0)
-    filename = f'sales_report_{start_date or 'all'}_{end_date or 'present'}.pdf'
+    filename = f"sales_report_{start_date or 'all'}_{end_date or 'present'}.pdf"
     return Response(
         buffer.getvalue(),
         mimetype='application/pdf',

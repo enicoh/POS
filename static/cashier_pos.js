@@ -61,8 +61,8 @@ async function loadSettings() {
             return;
         }
         
-        // If no saved settings, try to load from admin API (for admin users)
-        const response = await fetch('/api/pos/admin/settings', {
+        // If no saved settings, try to load from public POS settings API
+        const response = await fetch('/api/pos/settings', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                 'Content-Type': 'application/json'
@@ -70,11 +70,7 @@ async function loadSettings() {
         });
         
         if (response.ok) {
-            const result = await response.json();
-            const settingsMap = {};
-            result.settings.forEach(setting => {
-                settingsMap[setting.key] = setting.value;
-            });
+            const settingsMap = await response.json();
             
             // Save to localStorage for future use
             localStorage.setItem('posSettings', JSON.stringify(settingsMap));

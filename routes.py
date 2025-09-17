@@ -427,6 +427,14 @@ def get_dashboard_stats():
         return jsonify({'error': 'Failed to get dashboard statistics'}), 500
 
 # ---------- CASH REGISTER SESSIONS ----------
+@api.route('/cash-register-sessions', methods=['GET'])
+@_require_auth(Role.CASHIER)
+def list_cash_register_sessions():
+    """List cash register sessions for the current cashier (cashier only)."""
+    logger.info("Processing list cash register sessions request")
+    sessions = db.session.query(CashRegisterSession).filter_by(user_id=request.user.id).order_by(CashRegisterSession.start_time.desc()).all()
+    return jsonify([s.to_dict() for s in sessions]), 200
+
 @api.route('/cash-register-sessions', methods=['POST'])
 @_require_auth(Role.CASHIER)
 def open_cash_register_session():

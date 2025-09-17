@@ -160,6 +160,12 @@ def update_product(product_id):
             if data['stock'] < 0:
                 return jsonify({'error': 'Stock cannot be negative'}), 400
             product.stock = data['stock']
+        if 'category_id' in data:
+            # Validate category exists
+            new_category = db.session.get(Category, data['category_id'])
+            if not new_category or not new_category.is_active:
+                return jsonify({'error': 'Invalid category_id'}), 400
+            product.category_id = data['category_id']
         if 'description' in data:
             product.description = data['description']
         if 'image_url' in data:
@@ -316,12 +322,26 @@ def delete_product(product_id):
         return jsonify({'error': 'Product not found'}), 404
 
     try:
-        # Soft delete - set is_active to False
+        # Try hard delete when possible
+        from models import SaleItem, OrderItem
+        referenced_in_sales = db.session.query(SaleItem).filter_by(product_id=product.id).first() is not None
+        referenced_in_orders = db.session.query(OrderItem).filter_by(product_id=product.id).first() is not None
+
+        if not referenced_in_sales and not referenced_in_orders:
+            db.session.delete(product)
+            db.session.commit()
+            logger.info(f"Product hard-deleted: {product.name}")
+            return jsonify({'message': 'Product deleted permanently'}), 200
+        
+        # If referenced, perform soft delete but free up unique name
+        original_name = product.name
         product.is_active = False
+        # Rename to free the unique constraint for future creations
+        product.name = f"{original_name} [deleted #{product.id}]"
         product.updated_at = datetime.now(timezone.utc)
         db.session.commit()
-        logger.info(f"Product deleted: {product.name}")
-        return jsonify({'message': 'Product deleted successfully'}), 200
+        logger.info(f"Product soft-deleted and renamed from {original_name} to {product.name}")
+        return jsonify({'message': 'Product archived (historical references preserved)'}), 200
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error deleting product: {str(e)}")
@@ -439,8 +459,7 @@ def create_order():
                         )
                         db.session.add(order_item_modifier)
 
-            # Update product stock
-            product.stock -= item_data['quantity']
+            # Do NOT update product stock at order creation; stock is decremented on completion
 
         order.items = order_items
         order.subtotal = subtotal
@@ -486,6 +505,17 @@ def complete_order(order_id):
         return jsonify({'error': 'Invalid payment method'}), 400
 
     try:
+        # Re-validate stock and decrement now
+        for item in order.items:
+            product = db.session.get(Product, item.product_id)
+            if not product or not product.is_active:
+                return jsonify({'error': f'Product no longer available: {item.product_id}'}), 400
+            if product.stock < item.quantity:
+                return jsonify({'error': f'Insufficient stock for {product.name}'}), 400
+        for item in order.items:
+            product = db.session.get(Product, item.product_id)
+            product.stock -= item.quantity
+
         # Create payment
         payment = Payment(
             order_id=order.id,
@@ -1163,6 +1193,17 @@ def get_settings():
     except Exception as e:
         logger.error(f"Error getting settings: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@pos_api.route('/settings', methods=['GET'])
+@_require_auth()  # Any authenticated user
+def get_public_settings():
+    """Get settings for POS clients (cashier or admin)."""
+    try:
+        settings = Settings.query.all()
+        return jsonify({setting.key: setting.value for setting in settings}), 200
+    except Exception as e:
+        logger.error(f"Error getting public settings: {str(e)}")
+        return jsonify({'error': 'Failed to get settings'}), 500
 
 @pos_api.route('/admin/settings', methods=['POST'])
 @_require_auth(Role.ADMIN)

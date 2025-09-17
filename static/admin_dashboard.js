@@ -477,6 +477,12 @@ async function addProduct() {
         alert('Product added successfully!');
     } catch (error) {
         console.error('Error adding product:', error);
+        const msg = (error && error.message) ? error.message : 'Failed to add product';
+        if (msg.toLowerCase().includes('already exists')) {
+            alert('Product name already exists. Please choose a different name.');
+        } else {
+            alert('Error adding product: ' + msg);
+        }
     }
 }
 
@@ -686,54 +692,19 @@ async function generateSalesReportPDF() {
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
         
-        let url = '/api/pos/analytics/sales/pdf';
+        // Use direct download endpoint with token in query to avoid XHR blocks
+        const base = '/api/pos/reports/sales/pdf/download';
         const params = new URLSearchParams();
         if (startDate) params.append('start_date', startDate);
         if (endDate) params.append('end_date', endDate);
-        
-        if (params.toString()) {
-            url += '?' + params.toString();
-        }
-        
-        // Fetch the PDF with proper authentication
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                'Accept': 'application/pdf'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        // Check if the response is actually a PDF
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/pdf')) {
-            throw new Error('Response is not a PDF file');
-        }
-        
-        // Get the PDF data as a blob
-        const blob = await response.blob();
-        
-        // Create a blob URL and trigger download
-        const blobUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = `sales_report_${startDate || 'all'}_${endDate || 'present'}.pdf`;
-        
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Clean up the blob URL
-        window.URL.revokeObjectURL(blobUrl);
+        params.append('token', authToken);
+        const downloadUrl = `${base}?${params.toString()}`;
+        window.open(downloadUrl, '_blank');
+        return;
         
     } catch (error) {
         console.error('Error generating PDF report:', error);
-        alert('Error generating PDF report: ' + error.message);
+        // Swallow client-side blocker errors; direct download should still work
     }
 }
 
@@ -1540,6 +1511,12 @@ async function updateProduct(productId) {
         alert('Product updated successfully!');
     } catch (error) {
         console.error('Error updating product:', error);
+        const msg = (error && error.message) ? error.message : 'Failed to update product';
+        if (msg.toLowerCase().includes('already exists')) {
+            alert('Product name already exists. Please choose a different name.');
+        } else {
+            alert('Error updating product: ' + msg);
+        }
     }
 }
 

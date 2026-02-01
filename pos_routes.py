@@ -400,8 +400,10 @@ def create_order():
         db.session.flush()  # Get the order ID
 
         subtotal = 0
-        order_items = []
-
+        
+        # Use a list to collect items, then add to order at the end to avoid partial flushes
+        # causing issues with intermediate queries
+        
         for item_data in data['items']:
             product = db.session.get(Product, item_data['product_id'])
             if not product:
@@ -427,16 +429,17 @@ def create_order():
 
             # Calculate total price for this item
             item_total = unit_price * item_data['quantity']
-
-            # Add modifier costs
+            
+            # Temporary list for modifiers to calculate cost
+            active_modifiers = []
             if 'modifier_ids' in item_data:
                 for modifier_id in item_data['modifier_ids']:
                     modifier = db.session.get(ProductModifier, modifier_id)
                     if modifier and modifier.is_active:
+                        active_modifiers.append(modifier)
                         item_total += modifier.price_modifier * item_data['quantity']
 
             order_item = OrderItem(
-                order_id=order.id,
                 product_id=product.id,
                 size_id=size_id,
                 quantity=item_data['quantity'],
@@ -444,29 +447,23 @@ def create_order():
                 total_price=item_total,
                 special_instructions=item_data.get('special_instructions', '')
             )
-            order_items.append(order_item)
+            
+            # Add modifiers using relationship
+            for modifier in active_modifiers:
+                order_item_modifier = OrderItemModifier(
+                    modifier_id=modifier.id,
+                    price_modifier=modifier.price_modifier
+                )
+                order_item.modifiers.append(order_item_modifier)
+            
+            # Add item to order
+            order.items.append(order_item)
             subtotal += item_total
 
-            # Add modifiers to order item
-            if 'modifier_ids' in item_data:
-                for modifier_id in item_data['modifier_ids']:
-                    modifier = db.session.get(ProductModifier, modifier_id)
-                    if modifier and modifier.is_active:
-                        order_item_modifier = OrderItemModifier(
-                            order_item_id=order_item.id,
-                            modifier_id=modifier_id,
-                            price_modifier=modifier.price_modifier
-                        )
-                        db.session.add(order_item_modifier)
-
-            # Do NOT update product stock at order creation; stock is decremented on completion
-
-        order.items = order_items
         order.subtotal = subtotal
         order.tax_amount = 0  # No automatic tax - can be added manually if needed
         order.total = subtotal + order.tax_amount
 
-        db.session.add_all(order_items)
         db.session.commit()
         logger.info(f"Order created: ID={order.id}, Total={order.total}")
         return jsonify(order.to_dict()), 201

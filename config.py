@@ -16,7 +16,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///database.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TOKEN_EXPIRATION_MINUTES = int(os.environ.get('TOKEN_EXPIRATION_MINUTES', 240))
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')  # Default for development only
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin')  # Default for development only
 
 class TestConfig(Config):
     """Configuration for testing."""

@@ -417,9 +417,11 @@ body {
     padding: 0 !important; /* Most thermal printers have hardware margins */
     background: white !important;
     color: black !important;
-    font-family: "Courier New", monospace !important;
-    font-size: 11px !important;
-    line-height: 1.2 !important;
+    /* Use a thicker, clearer monospace font stack */
+    font-family: "Consolas", "Monaco", "Lucida Console", monospace !important;
+    font-weight: 700 !important; /* Force bold for clearer thermal printing */
+    font-size: 12px !important; /* Slightly larger for readability */
+    line-height: 1.3 !important;
   }
 
   #receipt-container * {
@@ -428,6 +430,14 @@ body {
   }
 
   /* Receipt Layout */
+  .receipt-logo {
+    display: block !important;
+    margin: 0 auto 5px auto !important;
+    max-width: 60% !important;
+    height: auto !important;
+    padding-bottom: 5px !important;
+  }
+
   .receipt-header {
     text-align: center !important;
     margin-bottom: 5px !important; /* Reduced from 10px */

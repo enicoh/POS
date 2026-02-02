@@ -92,7 +92,6 @@ async function loadSettings() {
 // Load default settings
 function loadDefaultSettings() {
   const defaultSettings = {
-    "shop-name": "My Coffee Shop",
     "shop-slogan": "Brewing Happiness",
     "currency-symbol": "DZD",
     "primary-color": "#007bff",
@@ -120,15 +119,6 @@ function applySettings(settings) {
     });
   } else {
     settingsMap = settings;
-  }
-
-  // Update shop name in header
-  if (settingsMap["shop-name"]) {
-    const titleElement = document.querySelector(".pos-header h1");
-    if (titleElement) {
-      titleElement.textContent = settingsMap["shop-name"];
-    }
-    document.title = settingsMap["shop-name"] + " - POS System";
   }
 
   // Apply color theme
@@ -1145,7 +1135,7 @@ function generateReceipt(order, payment) {
   // Construct receipt HTML
   let html = `
         <div class="receipt-header">
-            <div class="receipt-title">${shopName}</div>
+            <img src="/static/uploads/logo.png" class="receipt-logo" alt="Logo" onerror="this.src='/static/logo.png'; this.onerror=null;">
             <div class="receipt-info">Date: ${date}</div>
             <div class="receipt-info">Order #${order.id || "New"}</div>
             <div class="receipt-info">Cashier: ${cashierName}</div>

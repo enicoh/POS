@@ -920,6 +920,117 @@ async function showPendingOrders() {
   }
 }
 
+// Order History Management
+async function showOrderHistory() {
+  try {
+    await loadOrderHistoryList();
+    const modal = new bootstrap.Modal(
+      document.getElementById("orderHistoryModal"),
+    );
+    modal.show();
+  } catch (error) {
+    console.error("Error showing order history:", error);
+    alert("Error loading order history: " + error.message);
+  }
+}
+
+async function loadOrderHistoryList() {
+  try {
+    const orders = await apiCall("/pos/orders?status=completed");
+    const historyList = document.getElementById("order-history-list");
+
+    if (orders.length === 0) {
+      historyList.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No order history found</p>
+                </div>
+            `;
+    } else {
+      historyList.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${orders
+                              .map(
+                                (order) => `
+                                <tr>
+                                    <td><strong>#${order.id}</strong></td>
+                                    <td>${order.customer_name || "N/A"}</td>
+                                    <td>
+                                        <small class="text-muted">
+                                            ${order.items ? order.items.length : 0} item(s)
+                                        </small>
+                                    </td>
+                                    <td><strong>DZD ${order.total.toFixed(2)}</strong></td>
+                                    <td>
+                                        <small class="text-muted">
+                                            ${new Date(order.created_at).toLocaleString()}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-secondary btn-sm" onclick="event.stopPropagation(); printReceiptForOrder(${order.id})" title="Reprint Receipt">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning btn-sm" onclick="event.stopPropagation(); printKitchenReceipt(${order.id})" title="Kitchen Print">
+                                                <i class="fas fa-utensils"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `,
+                              )
+                              .join("")}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+    }
+  } catch (error) {
+    console.error("Error loading order history list:", error);
+    throw error;
+  }
+}
+
+async function printReceiptForOrder(orderId) {
+  try {
+    const order = await apiCall(`/pos/orders/${orderId}`);
+
+    // Fix: Map API property to what generateReceipt expects
+    order.total_price = order.total;
+
+    // Construct payment info even if not fully available, mainly for amount received
+    const paymentInfo = order.payment
+      ? {
+          method: order.payment.payment_method || "Cash",
+          amount_received: order.payment.amount,
+          change: 0, // We might not have this stored, assume 0 or calc if possible
+        }
+      : {
+          method: "Cash",
+          amount_received: order.total,
+          change: 0,
+        };
+
+    generateReceipt(order, paymentInfo);
+    setTimeout(() => window.print(), 500);
+  } catch (error) {
+    console.error("Error printing receipt:", error);
+    alert("Error printing receipt: " + error.message);
+  }
+}
+
 async function loadPendingOrdersList() {
   try {
     const orders = await apiCall("/pos/orders/pending");
@@ -966,6 +1077,9 @@ async function loadPendingOrdersList() {
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-warning btn-sm" onclick="event.stopPropagation(); printKitchenReceipt(${order.id})" title="Kitchen Print">
+                                                <i class="fas fa-utensils" style="font-size: 0.7rem;"></i>
+                                            </button>
                                             <button class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation(); loadPendingOrder(${order.id})" title="Load Order">
                                                 <i class="fas fa-edit" style="font-size: 0.7rem;"></i>
                                             </button>
@@ -1135,7 +1249,7 @@ function generateReceipt(order, payment) {
   // Construct receipt HTML
   let html = `
         <div class="receipt-header">
-            <img src="/static/uploads/logo.png" class="receipt-logo" alt="Logo" onerror="this.src='/static/logo.png'; this.onerror=null;">
+            <img src="${window.location.origin}/static/uploads/logo.png" class="receipt-logo" alt="Logo" onerror="this.src='${window.location.origin}/static/logo.png'; this.onerror=null;">
             <div class="receipt-info">Date: ${date}</div>
             <div class="receipt-info">Order #${order.id || "New"}</div>
             <div class="receipt-info">Cashier: ${cashierName}</div>
@@ -1212,4 +1326,84 @@ function generateReceipt(order, payment) {
     `;
 
   container.innerHTML = html;
+}
+
+// Kitchen Receipt Generation
+async function printKitchenReceipt(orderId) {
+  try {
+    const order = await apiCall(`/pos/orders/${orderId}`);
+    const container = document.getElementById("receipt-container");
+    const date = new Date().toLocaleString();
+
+    // Get cashier name safely
+    const cashierName =
+      currentUser && currentUser.username ? currentUser.username : "Staff";
+
+    let html = `
+            <div class="receipt-header">
+                <div class="receipt-title" style="font-size: 16px; border-bottom: 2px solid black; margin-bottom: 10px;">KITCHEN ORDER</div>
+                <div class="receipt-info">Order #${order.id}</div>
+                <div class="receipt-info">Date: ${date}</div>
+                <div class="receipt-info">Server: ${cashierName}</div>
+                ${order.customer_name ? `<div class="receipt-info">Customer: ${order.customer_name}</div>` : ""}
+            </div>
+            
+            <table class="receipt-table" style="font-size: 14px; font-weight: bold;">
+                <thead>
+                    <tr>
+                        <th class="qty-col" style="width: 20%;">Qty</th>
+                        <th class="item-col" style="width: 80%;">Item</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+    order.items.forEach((item) => {
+      const itemName =
+        item.product_name + (item.size_name ? ` (${item.size_name})` : "");
+
+      html += `
+                <tr>
+                    <td style="vertical-align: top; font-size: 16px;">${item.quantity}</td>
+                    <td style="white-space: normal;">
+                        <div style="font-size: 16px;">${itemName}</div>
+            `;
+
+      if (item.modifiers && item.modifiers.length > 0) {
+        html += `<div style="font-size: 12px; margin-left: 10px;">+ ${item.modifiers.map((m) => m.name).join(", ")}</div>`;
+      }
+
+      if (item.special_instructions) {
+        html += `<div style="font-size: 12px; font-style: italic; margin-left: 10px;">** ${item.special_instructions} **</div>`;
+      }
+
+      html += `
+                    </td>
+                </tr>
+                <tr><td colspan="2" style="border-bottom: 1px dashed #ccc; height: 5px;"></td></tr>
+            `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+            
+            ${
+              order.notes
+                ? `
+            <div style="margin-top: 10px; border-top: 1px solid black; padding-top: 5px;">
+                <strong>Order Notes:</strong><br>
+                ${order.notes}
+            </div>
+            `
+                : ""
+            }
+        `;
+
+    container.innerHTML = html;
+    setTimeout(() => window.print(), 500);
+  } catch (error) {
+    console.error("Error printing kitchen receipt:", error);
+    alert("Error printing kitchen receipt: " + error.message);
+  }
 }

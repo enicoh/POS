@@ -129,7 +129,8 @@ function Install-CoffeeShopPOS {
         
         $filesToCopy = @(
             "app.py", "config.py", "models.py", "populate_sample_data.py",
-            "pos_routes.py", "routes.py", "requirements.txt", "setup_database.py"
+            "pos_routes.py", "routes.py", "requirements.txt", "setup_database.py",
+            "logo.ico"
         )
         
         foreach ($file in $filesToCopy) {
@@ -265,6 +266,9 @@ pause >nul
         $Shortcut.TargetPath = "$script:InstallDir\start_pos.bat"
         $Shortcut.WorkingDirectory = $script:InstallDir
         $Shortcut.Description = "Coffee Shop POS System"
+        if (Test-Path "$script:InstallDir\logo.ico") {
+            $Shortcut.IconLocation = "$script:InstallDir\logo.ico"
+        }
         $Shortcut.Save()
         
         Write-Log "Desktop shortcut created"
@@ -305,8 +309,13 @@ function Show-InstallerGUI {
     $form.MinimizeBox = $false
     
     # Set icon (if available)
+    # Set icon (if available)
     try {
-        $form.Icon = [System.Drawing.SystemIcons]::Application
+        if (Test-Path "$script:SourceDir\logo.ico") {
+            $form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$script:SourceDir\logo.ico")
+        } else {
+            $form.Icon = [System.Drawing.SystemIcons]::Application
+        }
     }
     catch {
         # Icon not available, continue without it

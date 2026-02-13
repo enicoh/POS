@@ -843,10 +843,10 @@ def get_sales_analytics():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     
-    # Base query for completed orders that haven't been processed by daily reset
+    # Base query for completed orders without filtering out daily reset
+    # We want ALL completed orders for the selected period
     query = db.session.query(Order).filter(
-        Order.status == 'completed',
-        ~Order.special_instructions.like('%DAILY_RESET_%')
+        Order.status == 'completed'
     )
     
     try:
@@ -858,7 +858,10 @@ def get_sales_analytics():
         logger.error("Invalid date format in get sales analytics request")
         return jsonify({'error': 'Invalid date format (use ISO format)'}), 400
 
-    orders = query.all()
+    # Use eager loading to avoid N+1 queries
+    orders = query.options(
+        selectinload(Order.items).selectinload(OrderItem.product)
+    ).all()
     
     total_sales = sum(order.total for order in orders)
     total_orders = len(orders)
@@ -902,7 +905,10 @@ def generate_sales_report_pdf():
         logger.error("Invalid date format in generate sales report PDF request")
         return jsonify({'error': 'Invalid date format (use ISO format)'}), 400
 
-    orders = query.all()
+    # Use eager loading to avoid N+1 queries
+    orders = query.options(
+        selectinload(Order.items).selectinload(OrderItem.product)
+    ).all()
     
     total_sales = sum(order.total for order in orders)
     total_orders = len(orders)
@@ -1027,7 +1033,10 @@ def generate_sales_report_pdf_alias():
         logger.error("Invalid date format in generate sales report PDF (alias) request")
         return jsonify({'error': 'Invalid date format (use ISO format)'}), 400
     
-    orders = query.all()
+    # Use eager loading to avoid N+1 queries
+    orders = query.options(
+        selectinload(Order.items).selectinload(OrderItem.product)
+    ).all()
     
     total_sales = sum(order.total for order in orders)
     total_orders = len(orders)
@@ -1176,7 +1185,10 @@ def generate_sales_report_pdf_download():
     except ValueError:
         return jsonify({'error': 'Invalid date format (use ISO format)'}), 400
 
-    orders = query.all()
+    # Use eager loading to avoid N+1 queries
+    orders = query.options(
+        selectinload(Order.items).selectinload(OrderItem.product)
+    ).all()
 
     total_sales = sum(order.total for order in orders)
     total_orders = len(orders)

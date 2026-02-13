@@ -770,22 +770,67 @@ async function loadSalesAnalytics() {
 
 // Generate PDF report
 async function generateSalesReportPDF() {
+  const btn = document.querySelector(
+    'button[onclick="generateSalesReportPDF()"]',
+  );
+  const originalText = btn.innerHTML;
+
   try {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+
     const startDate = document.getElementById("start-date").value;
     const endDate = document.getElementById("end-date").value;
 
-    // Use direct download endpoint with token in query to avoid XHR blocks
-    const base = "/api/pos/reports/sales/pdf/download";
     const params = new URLSearchParams();
     if (startDate) params.append("start_date", startDate);
     if (endDate) params.append("end_date", endDate);
-    params.append("token", authToken);
-    const downloadUrl = `${base}?${params.toString()}`;
-    window.open(downloadUrl, "_blank");
-    return;
+
+    // Use fetch with authorization header for better security and error handling
+    const response = await fetch(
+      `/api/pos/reports/sales/pdf/download?${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to generate PDF");
+    }
+
+    // Get the filename from the content-disposition header if available
+    let filename = "sales_report.pdf";
+    const disposition = response.headers.get("content-disposition");
+    if (disposition && disposition.indexOf("attachment") !== -1) {
+      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      const matches = filenameRegex.exec(disposition);
+      if (matches != null && matches[1]) {
+        filename = matches[1].replace(/['"]/g, "");
+      }
+    }
+
+    // Create a blob from the response and trigger download
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   } catch (error) {
     console.error("Error generating PDF report:", error);
-    // Swallow client-side blocker errors; direct download should still work
+    alert(`Error generating PDF: ${error.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
   }
 }
 

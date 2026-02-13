@@ -1,11 +1,29 @@
 from flask import Flask, render_template, send_from_directory, request, redirect, url_for, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
+
+# --- Monkey Patch for ReportLab / hashlib compatibility ---
+# Fixes "TypeError: 'usedforsecurity' is an invalid keyword argument for openssl_md5()"
+import hashlib
+import logging
+
+try:
+    hashlib.md5(b'test', usedforsecurity=False)
+except TypeError:
+    # If the system openssl_md5 implementation doesn't support the flag, patch it
+    _original_md5 = hashlib.md5
+    
+    def _patched_md5(string=b'', *, usedforsecurity=True):
+        # Ignore usedforsecurity argument if the system doesn't support it
+        return _original_md5(string)
+        
+    hashlib.md5 = _patched_md5
+# -------------------------------------------------------------
+
 from models import db, User, Role
 from routes import init_app
 from pos_routes import init_pos_app
 from werkzeug.security import generate_password_hash
-import logging
 import os
 import jwt as pyjwt
 from datetime import datetime, timedelta

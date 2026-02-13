@@ -1173,103 +1173,111 @@ def generate_sales_report_pdf_download():
         return jsonify({'error': 'Authentication failed'}), 401
 
     # Reuse the alias logic for generating PDF
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
-
-    query = db.session.query(Order).filter_by(status='completed')
     try:
-        if start_date:
-            query = query.filter(Order.completed_at >= datetime.fromisoformat(start_date))
-        if end_date:
-            query = query.filter(Order.completed_at <= datetime.fromisoformat(end_date))
-    except ValueError:
-        return jsonify({'error': 'Invalid date format (use ISO format)'}), 400
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
 
-    # Use eager loading to avoid N+1 queries
-    orders = query.options(
-        selectinload(Order.items).selectinload(OrderItem.product)
-    ).all()
+        query = db.session.query(Order).filter_by(status='completed')
+        try:
+            if start_date:
+                query = query.filter(Order.completed_at >= datetime.fromisoformat(start_date))
+            if end_date:
+                query = query.filter(Order.completed_at <= datetime.fromisoformat(end_date))
+        except ValueError:
+            return jsonify({'error': 'Invalid date format (use ISO format)'}), 400
 
-    total_sales = sum(order.total for order in orders)
-    total_orders = len(orders)
+        # Use eager loading to avoid N+1 queries
+        orders = query.options(
+            selectinload(Order.items).selectinload(OrderItem.product)
+        ).all()
 
-    product_sales = {}
-    for order in orders:
-        for item in order.items:
-            product_name = item.product.name
-            if product_name not in product_sales:
-                product_sales[product_name] = {'quantity': 0, 'revenue': 0}
-            product_sales[product_name]['quantity'] += item.quantity
-            product_sales[product_name]['revenue'] += item.total_price
+        total_sales = sum(order.total for order in orders)
+        total_orders = len(orders)
 
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4)
-    styles = getSampleStyleSheet()
-    story = []
+        product_sales = {}
+        for order in orders:
+            for item in order.items:
+                product_name = item.product.name
+                if product_name not in product_sales:
+                    product_sales[product_name] = {'quantity': 0, 'revenue': 0}
+                product_sales[product_name]['quantity'] += item.quantity
+                product_sales[product_name]['revenue'] += item.total_price
 
-    title = Paragraph("Sales Report", styles['Title'])
-    story.append(title)
-    story.append(Paragraph("<br/>", styles['Normal']))
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        styles = getSampleStyleSheet()
+        story = []
 
-    period_text = f"Period: {start_date or 'All time'} to {end_date or 'Present'}"
-    story.append(Paragraph(period_text, styles['Normal']))
-    story.append(Paragraph("<br/>", styles['Normal']))
-
-    summary_data = [
-        ['Metric', 'Value'],
-        ['Total Sales', f'DZD {total_sales:.2f}'],
-        ['Total Orders', str(total_orders)]
-    ]
-    summary_table = Table(summary_data)
-    summary_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 14),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black)
-    ]))
-    story.append(summary_table)
-    story.append(Paragraph("<br/>", styles['Normal']))
-
-    if product_sales:
-        story.append(Paragraph("Product Sales", styles['Heading2']))
+        title = Paragraph("Sales Report", styles['Title'])
+        story.append(title)
         story.append(Paragraph("<br/>", styles['Normal']))
-        product_data = [['Product', 'Quantity Sold', 'Price Per Unit (DZD)', 'Revenue (DZD)']]
-        total_revenue = 0
-        for product, data in sorted(product_sales.items(), key=lambda x: x[1]['revenue'], reverse=True):
-            price_per_unit = data['revenue'] / data['quantity'] if data['quantity'] > 0 else 0
-            product_data.append([product, str(data['quantity']), f"{price_per_unit:.2f}", f"{data['revenue']:.2f}"])
-            total_revenue += data['revenue']
-        product_data.append(['TOTAL', '', '', f"{total_revenue:.2f}"])
-        product_table = Table(product_data)
-        product_table.setStyle(TableStyle([
+
+        period_text = f"Period: {start_date or 'All time'} to {end_date or 'Present'}"
+        story.append(Paragraph(period_text, styles['Normal']))
+        story.append(Paragraph("<br/>", styles['Normal']))
+
+        summary_data = [
+            ['Metric', 'Value'],
+            ['Total Sales', f'DZD {total_sales:.2f}'],
+            ['Total Orders', str(total_orders)]
+        ]
+        summary_table = Table(summary_data)
+        summary_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('BACKGROUND', (0, -1), (-1, -1), colors.lightblue),
-            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, -1), (-1, -1), 12)
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
-        story.append(product_table)
+        story.append(summary_table)
+        story.append(Paragraph("<br/>", styles['Normal']))
 
-    doc.build(story)
-    buffer.seek(0)
-    filename = f"sales_report_{start_date or 'all'}_{end_date or 'present'}.pdf"
-    return Response(
-        buffer.getvalue(),
-        mimetype='application/pdf',
-        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
-    )
+        if product_sales:
+            story.append(Paragraph("Product Sales", styles['Heading2']))
+            story.append(Paragraph("<br/>", styles['Normal']))
+            product_data = [['Product', 'Quantity Sold', 'Price Per Unit (DZD)', 'Revenue (DZD)']]
+            total_revenue = 0
+            for product, data in sorted(product_sales.items(), key=lambda x: x[1]['revenue'], reverse=True):
+                price_per_unit = data['revenue'] / data['quantity'] if data['quantity'] > 0 else 0
+                product_data.append([product, str(data['quantity']), f"{price_per_unit:.2f}", f"{data['revenue']:.2f}"])
+                total_revenue += data['revenue']
+            product_data.append(['TOTAL', '', '', f"{total_revenue:.2f}"])
+            product_table = Table(product_data)
+            product_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('BACKGROUND', (0, -1), (-1, -1), colors.lightblue),
+                ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, -1), (-1, -1), 12)
+            ]))
+            story.append(product_table)
 
-# ---------- FILE UPLOAD ----------
+        doc.build(story)
+        buffer.seek(0)
+        filename = f"sales_report_{start_date or 'all'}_{end_date or 'present'}.pdf"
+        return Response(
+            buffer.getvalue(),
+            mimetype='application/pdf',
+            headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+        )
+
+    # ---------- FILE UPLOAD ----------
+
+    except Exception as e:
+        logger.error(f"Error generating PDF report: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+
 @pos_api.route('/upload/image', methods=['POST'])
 @_require_auth(Role.ADMIN)
 def upload_image():
